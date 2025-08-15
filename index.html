@@ -29,34 +29,34 @@
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
-    <div class="bg-white rounded-3xl shadow-xl w-full max-w-6xl mx-auto p-8 lg:p-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="bg-white rounded-3xl shadow-xl w-full max-w-4xl mx-auto p-8 lg:p-12 flex flex-col space-y-8">
 
-        <!-- Cột 1: Nhập và quản lý từ vựng -->
-        <div class="lg:col-span-1 flex flex-col space-y-6">
-            <div class="flex items-center space-x-4 mb-4">
-                <!-- Link hình ảnh đã được cập nhật -->
+        <!-- Header và chức năng nhập từ -->
+        <div class="flex flex-col items-center text-center space-y-4">
+            <div class="flex items-center space-x-4">
                 <img src="https://scontent.fsgn16-1.fna.fbcdn.net/v/t39.30808-6/472919267_470131356146451_729434797204896135_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeE9ZTI6fgF9mTD0MyD7laeXfnuzvqEUccB-e7O-oRRxwDIaS-EDHpQHzBvfP5ea2zg62_N0eEpCNHkyzm5k46eP&_nc_ohc=6lFMDXtlVGwQ7kNvwFZPchX&_nc_oc=Adm9jx2WiHHJP81PAPZ0wg7aKKnUC-_k05rUmZjoJ5COmbps5Pdi4FYqFyQUR9INOmmhn6ZW-uUnq5QV5g3LmVDl&_nc_zt=23&_nc_ht=scontent.fsgn16-1.fna&_nc_gid=ztpM7fRjRnh3-lAg6D4kxg&oh=00_AfW9F3Z9mX7-zY6dElWdyZX_Kyte-6tcHrXIJoFgKsuTnA&oe=68A52689" alt="New Image" class="h-24 w-24 object-contain rounded-full">
                 <h1 class="text-3xl font-bold text-gray-800">Speak & Fix</h1>
             </div>
-            <p class="text-gray-600">
-                Nhập danh sách từ tiếng Anh (mỗi từ cách nhau bằng dấu phẩy hoặc xuống dòng).
+            <p class="text-gray-600 max-w-md">
+                Nhập từ hoặc số (bằng số) bạn muốn luyện phát âm, sau đó chọn từ để bắt đầu.
             </p>
-            <textarea id="word-input" class="w-full p-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" rows="5" placeholder="Nhập từ của bạn... (ví dụ: hello, world, apple, orange)"></textarea>
-            <button id="add-words-btn" class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg hover:bg-blue-700 transition-all">Thêm từ</button>
-
-            <div class="space-y-4">
-                <h2 class="text-xl font-semibold text-gray-700">Danh sách từ</h2>
-                <div id="word-list" class="flex flex-wrap gap-2 scroll-container p-2 border border-gray-200 rounded-2xl bg-gray-50">
-                    <!-- Từ sẽ được hiển thị ở đây -->
-                </div>
+            <div class="w-full flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+                <textarea id="word-input" class="w-full md:w-2/3 p-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" rows="2" placeholder="Nhập từ hoặc số của bạn... (ví dụ: hello, 123, world)"></textarea>
+                <button id="add-words-btn" class="w-full md:w-1/3 bg-blue-600 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg hover:bg-blue-700 transition-all">Thêm từ</button>
             </div>
         </div>
 
-        <!-- Cột 2: Luyện phát âm & Kết quả -->
-        <div class="lg:col-span-2 flex flex-col space-y-6">
-            <h2 class="text-2xl font-bold text-gray-800">Luyện phát âm</h2>
+        <!-- Danh sách từ đã nhập -->
+        <div class="space-y-4">
+            <h2 class="text-xl font-semibold text-gray-700">Danh sách từ đã thêm</h2>
+            <div id="word-list" class="flex flex-wrap gap-2 scroll-container p-2 border border-gray-200 rounded-2xl bg-gray-50">
+                <!-- Từ sẽ được hiển thị ở đây -->
+            </div>
+        </div>
 
-            <div class="bg-blue-50 p-6 rounded-2xl shadow-inner flex flex-col items-center justify-center space-y-4">
+        <!-- Khu vực luyện phát âm và kết quả -->
+        <div class="flex flex-col space-y-6 items-center">
+            <div class="bg-blue-50 p-6 rounded-2xl shadow-inner flex flex-col items-center justify-center space-y-4 w-full">
                 <p id="selected-word-display" class="text-4xl font-extrabold text-blue-800">
                     Chọn một từ để bắt đầu
                 </p>
@@ -70,20 +70,16 @@
                 </div>
             </div>
 
-            <div id="results-area" class="bg-white p-6 rounded-2xl shadow-inner space-y-4 hidden">
+            <div id="results-area" class="bg-white p-6 rounded-2xl shadow-inner space-y-4 w-full hidden">
                 <h3 class="text-2xl font-bold text-gray-800">Kết quả của bạn</h3>
-                <div class="flex items-center justify-between">
-                    <p class="text-lg text-gray-700">Bạn đã nói: <span id="user-transcript" class="font-semibold text-blue-600"></span></p>
+                <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+                    <p class="text-lg text-gray-700 text-center md:text-left">Bạn đã nói: <span id="user-transcript" class="font-semibold text-blue-600"></span></p>
                     <div class="flex items-center space-x-2">
                         <span class="text-xl font-bold text-gray-800">Điểm:</span>
                         <div id="score-display" class="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-md"></div>
                     </div>
                 </div>
-                <div id="feedback-message" class="text-lg text-gray-700 mt-2"></div>
-                <div id="pronunciation-tips-result" class="bg-yellow-100 p-4 rounded-xl text-gray-800 hidden">
-                    <p class="font-semibold">Cần chú ý:</p>
-                    <ul id="error-sounds-list" class="list-disc list-inside"></ul>
-                </div>
+                <div id="feedback-message" class="text-lg text-gray-700 mt-2 text-center md:text-left"></div>
             </div>
 
             <div id="api-unsupported-warning" class="bg-red-100 p-4 rounded-2xl text-red-700 hidden" role="alert">
@@ -92,37 +88,11 @@
             </div>
         </div>
 
-        <!-- Cột 3: Gợi ý học tập & Mẹo -->
-        <div class="lg:col-span-3 flex flex-col space-y-6">
-            <h2 class="text-2xl font-bold text-gray-800">Gợi ý học tập</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button id="pronunciation-tips-btn" class="bg-purple-600 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg hover:bg-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                    <span class="text-xl">📘</span> Mẹo phát âm
-                </button>
-                <button id="example-sentence-btn" class="bg-cyan-600 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg hover:bg-cyan-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                    <span class="text-xl">📚</span> Ví dụ trong câu
-                </button>
-            </div>
-        </div>
-
-        <!-- Dòng ghi công mới -->
-        <div class="lg:col-span-3">
+        <!-- Dòng ghi công -->
+        <div class="w-full">
             <p class="text-sm text-center text-gray-500 mt-8">Created by thầy Hiếu</p>
         </div>
 
-    </div>
-
-    <!-- Modal cho mẹo phát âm & ví dụ -->
-    <div id="tips-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl">
-            <div class="flex justify-between items-center mb-6">
-                <h3 id="modal-title" class="text-2xl font-bold text-gray-800">Mẹo phát âm</h3>
-                <button id="close-tips-modal" class="text-gray-500 hover:text-gray-800 text-3xl font-light leading-none">&times;</button>
-            </div>
-            <div id="tips-content" class="space-y-6 scroll-container">
-                <!-- Nội dung sẽ được thêm vào đây -->
-            </div>
-        </div>
     </div>
 
     <!-- Toast message -->
@@ -142,18 +112,8 @@
         const userTranscriptSpan = document.getElementById('user-transcript');
         const scoreDisplay = document.getElementById('score-display');
         const feedbackMessageDiv = document.getElementById('feedback-message');
-        const pronunciationTipsResultDiv = document.getElementById('pronunciation-tips-result');
-        const errorSoundsList = document.getElementById('error-sounds-list');
         const apiUnsupportedWarning = document.getElementById('api-unsupported-warning');
-        const pronunciationTipsBtn = document.getElementById('pronunciation-tips-btn');
-        const exampleSentenceBtn = document.getElementById('example-sentence-btn');
-        const tipsModal = document.getElementById('tips-modal');
-        const closeTipsModalBtn = document.getElementById('close-tips-modal');
-        const modalTitle = document.getElementById('modal-title');
-        const tipsContentDiv = document.getElementById('tips-content');
-        const toastMessageDiv = document.getElementById('toast-message');
-        const apiKey = ""; // API key cho Gemini
-
+        
         let selectedWord = '';
         let wordDataset = [];
 
@@ -164,13 +124,11 @@
         // API Speech Recognition
         let recognition = null;
         if (isSpeechRecognitionSupported) {
-            // Khởi tạo đối tượng SpeechRecognition
             recognition = new webkitSpeechRecognition();
             recognition.lang = 'en-US';
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
 
-            // Xử lý sự kiện khi bắt đầu ghi âm
             recognition.onstart = () => {
                 showToast("Đang lắng nghe... Hãy nói ngay bây giờ.", 5000);
                 recordBtn.textContent = 'Đang ghi âm...';
@@ -179,7 +137,6 @@
                 recordBtn.disabled = true;
             };
 
-            // Xử lý sự kiện khi kết thúc ghi âm
             recognition.onend = () => {
                 recordBtn.textContent = '🎙️ Luyện nói';
                 recordBtn.classList.add('bg-red-500', 'hover:bg-red-600');
@@ -187,16 +144,13 @@
                 recordBtn.disabled = false;
             };
 
-            // Xử lý kết quả nhận dạng
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
-                // Chuyển đổi số thành chữ trước khi chấm điểm
                 const convertedTranscript = convertDigitsToWords(transcript);
                 const result = scorePronunciation(selectedWord, convertedTranscript);
                 updateResultsUI(convertedTranscript, result);
             };
 
-            // Xử lý lỗi
             recognition.onerror = (event) => {
                 console.error("Speech recognition error:", event.error);
                 let errorMessage = 'Đã xảy ra lỗi trong quá trình ghi âm.';
@@ -213,104 +167,81 @@
             };
         }
 
-        // Hàm chuyển đổi số thành chữ
-        function convertDigitsToWords(text) {
+        // Hàm chuyển đổi số thành chữ cái
+        function convertNumberToWords(num) {
+            if (num === 0) return 'zero';
+
             const units = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
             const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
             const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
 
+            function convertThreeDigitsToWords(n) {
+                if (n === 0) return '';
+                if (n < 10) return units[n];
+                if (n < 20) return teens[n - 10];
+                if (n < 100) {
+                    const ten = Math.floor(n / 10);
+                    const unit = n % 10;
+                    return tens[ten] + (unit > 0 ? '-' + units[unit] : '');
+                }
+                const hundred = Math.floor(n / 100);
+                const remainder = n % 100;
+                let result = units[hundred] + ' hundred';
+                if (remainder > 0) {
+                    result += ' and ' + convertThreeDigitsToWords(remainder);
+                }
+                return result;
+            }
+
+            let words = '';
+            let isNegative = false;
+            if (num < 0) {
+                isNegative = true;
+                num = -num;
+            }
+
+            if (num < 1000) {
+                words = convertThreeDigitsToWords(num);
+            } else if (num < 1000000) {
+                const thousands = Math.floor(num / 1000);
+                const remainder = num % 1000;
+                words = convertNumberToWords(thousands) + ' thousand';
+                if (remainder > 0) {
+                    words += ' ' + convertNumberToWords(remainder);
+                }
+            } else if (num < 1000000000) {
+                const millions = Math.floor(num / 1000000);
+                const remainder = num % 1000000;
+                words = convertNumberToWords(millions) + ' million';
+                if (remainder > 0) {
+                    words += ' ' + convertNumberToWords(remainder);
+                }
+            } else {
+                return num.toString();
+            }
+            
+            return (isNegative ? 'negative ' : '') + words.trim();
+        }
+
+        function convertDigitsToWords(text) {
             let words = text.split(' ');
             let convertedWords = [];
 
             words.forEach(word => {
-                if (!isNaN(parseInt(word)) && isFinite(word)) {
-                    const num = parseInt(word);
-                    let numberAsWords = '';
-                    if (num === 0) {
-                        numberAsWords = 'zero';
-                    } else if (num < 10) {
-                        numberAsWords = units[num];
-                    } else if (num < 20) {
-                        numberAsWords = teens[num - 10];
-                    } else if (num < 100) {
-                        const ten = Math.floor(num / 10);
-                        const unit = num % 10;
-                        numberAsWords = tens[ten] + (unit > 0 ? ' ' + units[unit] : '');
-                    } else {
-                        // Giữ nguyên các số lớn hơn 99 để đơn giản
-                        numberAsWords = word;
-                    }
-                    convertedWords.push(numberAsWords);
+                const num = parseInt(word);
+                if (!isNaN(num) && isFinite(word)) {
+                    convertedWords.push(convertNumberToWords(num));
                 } else {
                     convertedWords.push(word);
                 }
             });
-
             return convertedWords.join(' ');
         }
         
-        // IPA Dictionary cho một số từ phổ biến
-        const IPA_DICT = {
-            'think': '/θɪŋk/', 'world': '/wɜːld/', 'water': '/ˈwɔːtər/', 'purple': '/ˈpɜːrpl/',
-            'really': '/ˈriːəli/', 'apple': '/ˈæpl/', 'orange': '/ˈɔːrɪndʒ/', 'hello': '/həˈloʊ/',
-            'beautiful': '/ˈbjuːtəfl/', 'thorough': '/ˈθɜːroʊ/', 'schedule': '/ˈskedʒuːl/',
-            'strength': '/streŋθ/', 'clothes': '/kloʊðz/', 'rhythm': '/ˈrɪðəm/',
-            'sixth': '/sɪksθ/', 'rural': '/ˈrʊərəl/', 'litter': '/ˈlɪtər/', 'little': '/ˈlɪtl/',
-            'thistle': '/ˈθɪsl/', 'weather': '/ˈweðər/', 'theory': '/ˈθɪəri/'
-        };
-
-        // Mẹo phát âm cho các âm khó
-        const PRONUNCIATION_TIPS = {
-            'θ': {
-                name: 'âm /θ/ (th trong "think")',
-                tip: 'Đặt đầu lưỡi giữa hai hàm răng và đẩy không khí ra ngoài. Đây là một âm vô thanh, không làm rung dây thanh quản.',
-                example: 'think, thank, three, theory'
-            },
-            'ð': {
-                name: 'âm /ð/ (th trong "the")',
-                tip: 'Giống như /θ/, đặt đầu lưỡi giữa hai hàm răng nhưng đồng thời làm rung dây thanh quản để tạo ra âm hữu thanh.',
-                example: 'the, this, that, weather'
-            },
-            'r': {
-                name: 'âm /r/',
-                tip: 'Cuộn lưỡi ra phía sau, không chạm vòm miệng. Môi hơi tròn. Tránh cuộn lưỡi giống như trong tiếng Việt.',
-                example: 'run, red, really, world'
-            },
-            'l': {
-                name: 'âm /l/',
-                tip: 'Đặt đầu lưỡi vào sau răng cửa trên. Có hai loại: "light l" (đầu từ) và "dark l" (cuối từ). Cố gắng giữ âm rõ ràng.',
-                example: 'light, little, really, feel'
-            },
-            'æ': {
-                name: 'âm /æ/ (a trong "apple")',
-                tip: 'Mở miệng rộng, hạ cằm xuống thấp. Đây là âm giữa "a" và "e" trong tiếng Việt. Ví dụ: "cắn táo" để cảm nhận.',
-                example: 'apple, cat, hat, black'
-            },
-            'ɪ vs iː': {
-                name: 'phân biệt /ɪ/ và /iː/',
-                tip: '/ɪ/ (trong "sit") là âm ngắn, miệng thả lỏng. /iː/ (trong "seat") là âm dài, miệng căng ra như cười.',
-                example: 'sit vs seat, bit vs beat, ship vs sheep'
-            },
-            'ʌ vs ɑː': {
-                name: 'phân biệt /ʌ/ và /ɑː/',
-                tip: '/ʌ/ (trong "cup") là âm ngắn, hơi hướng về âm "ă" tiếng Việt. /ɑː/ (trong "car") là âm dài, miệng mở tròn, như "a" kéo dài.',
-                example: 'cup vs car, fun vs father, but vs part'
-            },
-            'v vs w': {
-                name: 'phân biệt /v/ và /w/',
-                tip: '/v/ (trong "very") dùng răng trên chạm môi dưới. /w/ (trong "we") môi tròn, giống như đang huýt sáo.',
-                example: 'very vs we, voice vs word'
-            },
-            'p vs b': {
-                name: 'phân biệt /p/ và /b/',
-                tip: '/p/ (trong "pin") là âm vô thanh, không rung. /b/ (trong "bin") là âm hữu thanh, có rung dây thanh quản.',
-                example: 'pin vs bin, pat vs bat, play vs blow'
-            }
-        };
-
         // ============== Logic ứng dụng ==============
 
         // Hàm hiển thị Toast message
+        const toastMessageDiv = document.getElementById('toast-message');
         function showToast(message, duration = 3000) {
             toastMessageDiv.textContent = message;
             toastMessageDiv.classList.remove('opacity-0', 'hidden');
@@ -373,7 +304,7 @@
             selectedWord = word;
             selectedWordDisplay.textContent = word;
             resultsArea.classList.add('hidden');
-            renderWordList(); // Re-render để cập nhật trạng thái đã chọn
+            renderWordList();
             updateButtonsState();
         }
 
@@ -395,8 +326,6 @@
             const isWordSelected = selectedWord.length > 0;
             speakBtn.disabled = !isWordSelected || !isSpeechSynthesisSupported;
             recordBtn.disabled = !isWordSelected || !isSpeechRecognitionSupported;
-            pronunciationTipsBtn.disabled = !isWordSelected;
-            exampleSentenceBtn.disabled = !isWordSelected;
 
             if (!isSpeechRecognitionSupported) {
                 apiUnsupportedWarning.classList.remove('hidden');
@@ -427,45 +356,19 @@
 
         // Hàm so sánh và chấm điểm
         function scorePronunciation(targetWord, spokenText) {
-            const normalizedTarget = targetWord.toLowerCase().replace(/[^a-z]/g, '');
+            let processedTarget = targetWord;
+            if (!isNaN(targetWord) && isFinite(targetWord)) {
+                processedTarget = convertDigitsToWords(targetWord);
+            }
+
+            const normalizedTarget = processedTarget.toLowerCase().replace(/[^a-z]/g, '');
             const normalizedSpoken = spokenText.toLowerCase().replace(/[^a-z]/g, '');
 
-            // Mức 1: So sánh chính tả (Levenshtein)
             const distance = levenshtein(normalizedTarget, normalizedSpoken);
             const maxLength = Math.max(normalizedTarget.length, normalizedSpoken.length);
             let score = maxLength > 0 ? Math.round((1 - distance / maxLength) * 100) : 100;
 
-            // Kiểm tra các lỗi phát âm cơ bản (dựa trên IPA)
-            const targetIPA = IPA_DICT[targetWord.toLowerCase()];
-            const incorrectSounds = [];
-            let ipaFeedback = '';
-
-            if (targetIPA) {
-                // Heuristics: Giả định một số lỗi phổ biến dựa trên phát âm
-                const ipaKeys = Object.keys(PRONUNCIATION_TIPS);
-                ipaKeys.forEach(sound => {
-                    // Kiểm tra sự hiện diện của âm trong từ mục tiêu
-                    if (targetIPA.includes(sound.replace(' vs iː', 'i').replace(' vs ɑː', 'a').replace(' vs w', 'w').replace(' vs b', 'b'))) {
-                         // Đây là một cách đơn giản, cần logic phức tạp hơn
-                        const regex = new RegExp(sound.replace(' vs iː', '|').replace(' vs ɑː', '|').replace(' vs w', '|').replace(' vs b', '|'), 'i');
-                        if (!regex.test(normalizedSpoken) && !incorrectSounds.includes(sound)) {
-                            incorrectSounds.push(sound);
-                            score = Math.max(0, score - 5);
-                        }
-                    }
-                });
-
-                // Kiểm tra trọng âm (giả định bằng cách so sánh độ dài âm tiết)
-                const stressSymbol = 'ˈ';
-                if (targetIPA.includes(stressSymbol)) {
-                    if (normalizedSpoken.length < normalizedTarget.length * 0.8 || normalizedSpoken.length > normalizedTarget.length * 1.2) {
-                        score = Math.max(0, score - 5);
-                        ipaFeedback = 'Có vẻ trọng âm chưa đúng. Hãy chú ý vào âm được nhấn trong từ.';
-                    }
-                }
-            }
-
-            return { score, feedback: { incorrectSounds, ipaFeedback } };
+            return { score };
         }
 
         // Hàm cập nhật giao diện kết quả
@@ -476,102 +379,19 @@
             let message = '';
             let color = '';
             if (result.score >= 85) {
-                message = 'Phát âm tốt! Hãy giữ nhịp điệu này.';
+                message = 'Phát âm tốt! Bạn làm rất tốt.';
                 color = 'bg-green-500';
             } else if (result.score >= 70) {
-                message = `Ổn, cần rõ hơn âm: ${result.feedback.incorrectSounds.length > 0 ? result.feedback.incorrectSounds.map(s => `<b>/${s}/</b>`).join(', ') : '(không có gợi ý)'}.`;
+                message = `Phát âm tạm ổn. Cần luyện tập thêm một chút nhé.`;
                 color = 'bg-yellow-500';
             } else {
-                message = `Cần luyện thêm. Tập trung vào âm: ${result.feedback.incorrectSounds.length > 0 ? result.feedback.incorrectSounds.map(s => `<b>/${s}/</b>`).join(', ') : '(không có gợi ý)'}.`;
+                message = `Cần luyện thêm. Cố gắng phát âm rõ ràng hơn.`;
                 color = 'bg-red-500';
             }
 
             scoreDisplay.textContent = result.score;
             scoreDisplay.className = `w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-md ${color}`;
-            feedbackMessageDiv.innerHTML = message + (result.feedback.ipaFeedback ? `<br><i>${result.feedback.ipaFeedback}</i>` : '');
-
-            if (result.feedback.incorrectSounds.length > 0) {
-                pronunciationTipsResultDiv.classList.remove('hidden');
-                errorSoundsList.innerHTML = '';
-                result.feedback.incorrectSounds.forEach(sound => {
-                    const tip = PRONUNCIATION_TIPS[sound];
-                    const li = document.createElement('li');
-                    li.innerHTML = `Âm <b>/${sound}/</b>: ${tip ? tip.tip : 'Đang cập nhật... '}`;
-                    errorSoundsList.appendChild(li);
-                });
-            } else {
-                pronunciationTipsResultDiv.classList.add('hidden');
-            }
-        }
-
-        // Hàm gọi API Gemini để tạo câu ví dụ
-        async function generateAndDisplayExampleSentences(word) {
-            // Hiển thị trạng thái đang tải
-            exampleSentenceBtn.textContent = 'Đang tạo...';
-            exampleSentenceBtn.disabled = true;
-
-            const prompt = `Generate 5 example sentences for the English word "${word}". Each sentence should be on a new line.`;
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-            const payload = { contents: chatHistory };
-            let retries = 0;
-            const maxRetries = 3;
-            const delay = 1000;
-
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-            while (retries < maxRetries) {
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    const result = await response.json();
-                    if (result.candidates && result.candidates.length > 0 &&
-                        result.candidates[0].content && result.candidates[0].content.parts &&
-                        result.candidates[0].content.parts.length > 0) {
-                        const text = result.candidates[0].content.parts[0].text;
-                        const sentences = text.trim().split('\n').filter(s => s.length > 0);
-                        
-                        // Cập nhật nội dung modal
-                        let contentHtml = `<h4 class="text-xl font-bold mb-4">5 câu ví dụ cho từ "${word}"</h4>`;
-                        contentHtml += '<ul class="space-y-4">';
-                        sentences.forEach(sentence => {
-                            contentHtml += `<li class="bg-gray-100 p-3 rounded-xl shadow-sm text-gray-700">${sentence.trim()}</li>`;
-                        });
-                        contentHtml += '</ul>';
-                        
-                        displayModal('Ví dụ trong câu', contentHtml);
-                        break; // Thành công, thoát vòng lặp
-                    }
-                } catch (e) {
-                    console.error('API call failed:', e);
-                    retries++;
-                    if (retries < maxRetries) {
-                        await new Promise(res => setTimeout(res, delay * Math.pow(2, retries)));
-                    } else {
-                        showToast("Không thể tạo ví dụ. Vui lòng thử lại sau.", 5000);
-                        displayModal('Lỗi', '<p class="text-red-600">Không thể tải ví dụ. Có lỗi xảy ra khi kết nối với máy chủ.</p>');
-                    }
-                }
-            }
-            
-            // Khôi phục trạng thái nút
-            exampleSentenceBtn.textContent = '📚 Ví dụ trong câu';
-            exampleSentenceBtn.disabled = false;
-        }
-
-        // Hàm hiển thị modal chung
-        function displayModal(title, content) {
-            modalTitle.textContent = title;
-            tipsContentDiv.innerHTML = content;
-            tipsModal.classList.remove('hidden');
+            feedbackMessageDiv.innerHTML = message;
         }
 
         // ============== Các sự kiện ==============
@@ -582,7 +402,7 @@
                 .split(/,|\n/)
                 .map(word => word.trim().toLowerCase())
                 .filter(word => word.length > 0);
-            wordDataset = [...new Set([...wordDataset, ...newWords])]; // Loại bỏ trùng lặp
+            wordDataset = [...new Set([...wordDataset, ...newWords])];
             wordInput.value = '';
             saveWordsToLocalStorage();
             renderWordList();
@@ -605,7 +425,6 @@
                 try {
                     recognition.start();
                 } catch (e) {
-                    // Bắt lỗi nếu đã có phiên ghi âm đang chạy
                     console.error("Failed to start speech recognition:", e);
                     showToast("Đã có phiên ghi âm đang hoạt động hoặc xảy ra lỗi. Vui lòng thử lại sau.", 5000);
                 }
@@ -613,53 +432,6 @@
                 showToast("Tính năng này không được hỗ trợ trên trình duyệt của bạn.", 3000);
             }
         });
-
-        // Nút Mẹo phát âm
-        pronunciationTipsBtn.addEventListener('click', () => {
-            if (selectedWord) {
-                const tips = getPronunciationTips(selectedWord);
-                displayModal('Mẹo phát âm', tips);
-            }
-        });
-
-        // Nút Ví dụ trong câu
-        exampleSentenceBtn.addEventListener('click', () => {
-            if (selectedWord) {
-                generateAndDisplayExampleSentences(selectedWord);
-            }
-        });
-
-        // Đóng modal
-        closeTipsModalBtn.addEventListener('click', () => {
-            tipsModal.classList.add('hidden');
-        });
-
-        // Hàm lấy mẹo phát âm
-        function getPronunciationTips(word) {
-            const ipa = IPA_DICT[word.toLowerCase()];
-            if (!ipa) {
-                return '<p>Không tìm thấy mẹo phát âm cho từ này. Vui lòng chọn một từ khác.</p>';
-            }
-
-            let tipsHtml = `<p>Phiên âm IPA của từ "${word}" là: <b>${ipa}</b></p>`;
-            tipsHtml += '<p class="mt-4 font-semibold text-lg">Mẹo phát âm cho các âm chính:</p>';
-            
-            // Tìm và thêm các mẹo dựa trên các âm trong IPA
-            Object.keys(PRONUNCIATION_TIPS).forEach(soundKey => {
-                if (ipa.includes(soundKey.replace(' vs iː', 'i').replace(' vs ɑː', 'a').replace(' vs w', 'w').replace(' vs b', 'b'))) {
-                    const tip = PRONUNCIATION_TIPS[soundKey];
-                    tipsHtml += `
-                        <div class="bg-gray-100 p-4 rounded-xl shadow-sm">
-                            <h4 class="font-bold text-gray-700">${tip.name}</h4>
-                            <p class="text-sm mt-1">${tip.tip}</p>
-                            <p class="text-xs italic mt-2">Ví dụ: ${tip.example}</p>
-                        </div>
-                    `;
-                }
-            });
-
-            return tipsHtml;
-        }
 
         // Tải dữ liệu khi trang được tải
         window.addEventListener('load', () => {
