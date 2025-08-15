@@ -101,17 +101,22 @@
             </div>
         </div>
 
+        <!-- Dòng ghi công mới -->
+        <div class="lg:col-span-3">
+            <p class="text-sm text-center text-gray-500 mt-8">Created by thầy Hiếu</p>
+        </div>
+
     </div>
 
-    <!-- Modal cho mẹo phát âm -->
+    <!-- Modal cho mẹo phát âm & ví dụ -->
     <div id="tips-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-gray-800">Mẹo phát âm</h3>
+                <h3 id="modal-title" class="text-2xl font-bold text-gray-800">Mẹo phát âm</h3>
                 <button id="close-tips-modal" class="text-gray-500 hover:text-gray-800 text-3xl font-light leading-none">&times;</button>
             </div>
             <div id="tips-content" class="space-y-6 scroll-container">
-                <!-- Nội dung mẹo phát âm sẽ được thêm vào đây -->
+                <!-- Nội dung sẽ được thêm vào đây -->
             </div>
         </div>
     </div>
@@ -140,8 +145,10 @@
         const exampleSentenceBtn = document.getElementById('example-sentence-btn');
         const tipsModal = document.getElementById('tips-modal');
         const closeTipsModalBtn = document.getElementById('close-tips-modal');
+        const modalTitle = document.getElementById('modal-title');
         const tipsContentDiv = document.getElementById('tips-content');
         const toastMessageDiv = document.getElementById('toast-message');
+        const apiKey = ""; // API key cho Gemini
 
         let selectedWord = '';
         let wordDataset = [];
@@ -179,8 +186,8 @@
             // Xử lý kết quả nhận dạng
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
-                const score = scorePronunciation(selectedWord, transcript);
-                updateResultsUI(transcript, score);
+                const result = scorePronunciation(selectedWord, transcript);
+                updateResultsUI(transcript, result);
             };
 
             // Xử lý lỗi
@@ -257,18 +264,6 @@
                 tip: '/p/ (trong "pin") là âm vô thanh, không rung. /b/ (trong "bin") là âm hữu thanh, có rung dây thanh quản.',
                 example: 'pin vs bin, pat vs bat, play vs blow'
             }
-        };
-
-        // Ví dụ trong câu cho một số từ
-        const EXAMPLE_SENTENCES = {
-            'think': "I think this is a great idea.",
-            'world': "The world is a very big place.",
-            'water': "Could you please bring me a glass of water?",
-            'purple': "My favorite color is purple.",
-            'really': "I'm really excited about this.",
-            'apple': "An apple a day keeps the doctor away.",
-            'orange': "I like to drink orange juice.",
-            'hello': "Hello, how are you today?",
         };
 
         // ============== Logic ứng dụng ==============
@@ -408,7 +403,7 @@
                 const ipaKeys = Object.keys(PRONUNCIATION_TIPS);
                 ipaKeys.forEach(sound => {
                     // Kiểm tra sự hiện diện của âm trong từ mục tiêu
-                    if (targetIPA.includes(sound.replace(' vs iː', '').replace(' vs ɑː', '').replace(' vs w', '').replace(' vs b', ''))) {
+                    if (targetIPA.includes(sound.replace(' vs iː', 'i').replace(' vs ɑː', 'a').replace(' vs w', 'w').replace(' vs b', 'b'))) {
                          // Đây là một cách đơn giản, cần logic phức tạp hơn
                         const regex = new RegExp(sound.replace(' vs iː', '|').replace(' vs ɑː', '|').replace(' vs w', '|').replace(' vs b', '|'), 'i');
                         if (!regex.test(normalizedSpoken) && !incorrectSounds.includes(sound)) {
@@ -467,6 +462,76 @@
             }
         }
 
+        // Hàm gọi API Gemini để tạo câu ví dụ
+        async function generateAndDisplayExampleSentences(word) {
+            // Hiển thị trạng thái đang tải
+            exampleSentenceBtn.textContent = 'Đang tạo...';
+            exampleSentenceBtn.disabled = true;
+
+            const prompt = `Generate 5 example sentences for the English word "${word}". Each sentence should be on a new line.`;
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            let retries = 0;
+            const maxRetries = 3;
+            const delay = 1000;
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            while (retries < maxRetries) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        const sentences = text.trim().split('\n').filter(s => s.length > 0);
+                        
+                        // Cập nhật nội dung modal
+                        let contentHtml = `<h4 class="text-xl font-bold mb-4">5 câu ví dụ cho từ "${word}"</h4>`;
+                        contentHtml += '<ul class="space-y-4">';
+                        sentences.forEach(sentence => {
+                            contentHtml += `<li class="bg-gray-100 p-3 rounded-xl shadow-sm text-gray-700">${sentence.trim()}</li>`;
+                        });
+                        contentHtml += '</ul>';
+                        
+                        displayModal('Ví dụ trong câu', contentHtml);
+                        break; // Thành công, thoát vòng lặp
+                    }
+                } catch (e) {
+                    console.error('API call failed:', e);
+                    retries++;
+                    if (retries < maxRetries) {
+                        await new Promise(res => setTimeout(res, delay * Math.pow(2, retries)));
+                    } else {
+                        showToast("Không thể tạo ví dụ. Vui lòng thử lại sau.", 5000);
+                        displayModal('Lỗi', '<p class="text-red-600">Không thể tải ví dụ. Có lỗi xảy ra khi kết nối với máy chủ.</p>');
+                    }
+                }
+            }
+            
+            // Khôi phục trạng thái nút
+            exampleSentenceBtn.textContent = '📚 Ví dụ trong câu';
+            exampleSentenceBtn.disabled = false;
+        }
+
+        // Hàm hiển thị modal chung
+        function displayModal(title, content) {
+            modalTitle.textContent = title;
+            tipsContentDiv.innerHTML = content;
+            tipsModal.classList.remove('hidden');
+        }
+
         // ============== Các sự kiện ==============
 
         // Nút Thêm từ
@@ -511,19 +576,18 @@
         pronunciationTipsBtn.addEventListener('click', () => {
             if (selectedWord) {
                 const tips = getPronunciationTips(selectedWord);
-                displayTipsModal(tips);
+                displayModal('Mẹo phát âm', tips);
             }
         });
 
         // Nút Ví dụ trong câu
         exampleSentenceBtn.addEventListener('click', () => {
             if (selectedWord) {
-                const sentence = EXAMPLE_SENTENCES[selectedWord.toLowerCase()] || `I'm learning to say the word "${selectedWord}".`;
-                showToast(`Ví dụ: "${sentence}"`, 8000);
+                generateAndDisplayExampleSentences(selectedWord);
             }
         });
 
-        // Đóng modal mẹo phát âm
+        // Đóng modal
         closeTipsModalBtn.addEventListener('click', () => {
             tipsModal.classList.add('hidden');
         });
@@ -553,12 +617,6 @@
             });
 
             return tipsHtml;
-        }
-
-        // Hàm hiển thị modal mẹo phát âm
-        function displayTipsModal(content) {
-            tipsContentDiv.innerHTML = content;
-            tipsModal.classList.remove('hidden');
         }
 
         // Tải dữ liệu khi trang được tải
