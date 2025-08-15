@@ -36,7 +36,7 @@
             <div class="flex items-center space-x-4 mb-4">
                 <!-- Link hình ảnh đã được cập nhật -->
                 <img src="https://scontent.fsgn16-1.fna.fbcdn.net/v/t39.30808-6/472919267_470131356146451_729434797204896135_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeE9ZTI6fgF9mTD0MyD7laeXfnuzvqEUccB-e7O-oRRxwDIaS-EDHpQHzBvfP5ea2zg62_N0eEpCNHkyzm5k46eP&_nc_ohc=6lFMDXtlVGwQ7kNvwFZPchX&_nc_oc=Adm9jx2WiHHJP81PAPZ0wg7aKKnUC-_k05rUmZjoJ5COmbps5Pdi4FYqFyQUR9INOmmhn6ZW-uUnq5QV5g3LmVDl&_nc_zt=23&_nc_ht=scontent.fsgn16-1.fna&_nc_gid=ztpM7fRjRnh3-lAg6D4kxg&oh=00_AfW9F3Z9mX7-zY6dElWdyZX_Kyte-6tcHrXIJoFgKsuTnA&oe=68A52689" alt="New Image" class="h-24 w-24 object-contain rounded-full">
-                <h1 class="text-3xl font-bold text-gray-800">Speak & Fix - Thầy Hiếu</h1>
+                <h1 class="text-3xl font-bold text-gray-800">Speak & Fix</h1>
             </div>
             <p class="text-gray-600">
                 Nhập danh sách từ tiếng Anh (mỗi từ cách nhau bằng dấu phẩy hoặc xuống dòng).
@@ -190,8 +190,10 @@
             // Xử lý kết quả nhận dạng
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
-                const result = scorePronunciation(selectedWord, transcript);
-                updateResultsUI(transcript, result);
+                // Chuyển đổi số thành chữ trước khi chấm điểm
+                const convertedTranscript = convertDigitsToWords(transcript);
+                const result = scorePronunciation(selectedWord, convertedTranscript);
+                updateResultsUI(convertedTranscript, result);
             };
 
             // Xử lý lỗi
@@ -211,6 +213,42 @@
             };
         }
 
+        // Hàm chuyển đổi số thành chữ
+        function convertDigitsToWords(text) {
+            const units = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+            const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+            const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+
+            let words = text.split(' ');
+            let convertedWords = [];
+
+            words.forEach(word => {
+                if (!isNaN(parseInt(word)) && isFinite(word)) {
+                    const num = parseInt(word);
+                    let numberAsWords = '';
+                    if (num === 0) {
+                        numberAsWords = 'zero';
+                    } else if (num < 10) {
+                        numberAsWords = units[num];
+                    } else if (num < 20) {
+                        numberAsWords = teens[num - 10];
+                    } else if (num < 100) {
+                        const ten = Math.floor(num / 10);
+                        const unit = num % 10;
+                        numberAsWords = tens[ten] + (unit > 0 ? ' ' + units[unit] : '');
+                    } else {
+                        // Giữ nguyên các số lớn hơn 99 để đơn giản
+                        numberAsWords = word;
+                    }
+                    convertedWords.push(numberAsWords);
+                } else {
+                    convertedWords.push(word);
+                }
+            });
+
+            return convertedWords.join(' ');
+        }
+        
         // IPA Dictionary cho một số từ phổ biến
         const IPA_DICT = {
             'think': '/θɪŋk/', 'world': '/wɜːld/', 'water': '/ˈwɔːtər/', 'purple': '/ˈpɜːrpl/',
