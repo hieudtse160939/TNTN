@@ -26,6 +26,17 @@
             max-height: 400px;
             overflow-y: auto;
         }
+        .highlight-correct {
+            color: #16a34a; /* green-600 */
+        }
+        .highlight-incorrect {
+            color: #dc2626; /* red-600 */
+            text-decoration: underline;
+            text-decoration-color: #dc2626;
+        }
+        .highlight-extra {
+            color: #fb923c; /* orange-400 */
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
@@ -60,6 +71,7 @@
                 <p id="selected-word-display" class="text-4xl font-extrabold text-blue-800">
                     Chọn một từ để bắt đầu
                 </p>
+                <p id="ipa-display" class="text-xl font-medium text-gray-600 italic hidden"></p>
                 <div class="flex space-x-4">
                     <button id="speak-btn" class="bg-green-500 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg hover:bg-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled aria-label="Nghe phát âm mẫu (phím tắt: Enter)">
                         <span class="text-xl">🔊</span> Nghe mẫu
@@ -80,6 +92,10 @@
                     </div>
                 </div>
                 <div id="feedback-message" class="text-lg text-gray-700 mt-2 text-center md:text-left"></div>
+                <div id="comparison-area" class="mt-4 text-center md:text-left">
+                    <p class="text-base text-gray-600">So sánh với từ gốc:</p>
+                    <p id="comparison-text" class="text-2xl font-bold tracking-wide"></p>
+                </div>
             </div>
 
             <div id="api-unsupported-warning" class="bg-red-100 p-4 rounded-2xl text-red-700 hidden" role="alert">
@@ -106,16 +122,30 @@
         const addWordsBtn = document.getElementById('add-words-btn');
         const wordList = document.getElementById('word-list');
         const selectedWordDisplay = document.getElementById('selected-word-display');
+        const ipaDisplay = document.getElementById('ipa-display');
         const speakBtn = document.getElementById('speak-btn');
         const recordBtn = document.getElementById('record-btn');
         const resultsArea = document.getElementById('results-area');
         const userTranscriptSpan = document.getElementById('user-transcript');
         const scoreDisplay = document.getElementById('score-display');
         const feedbackMessageDiv = document.getElementById('feedback-message');
+        const comparisonTextDiv = document.getElementById('comparison-text');
         const apiUnsupportedWarning = document.getElementById('api-unsupported-warning');
         
         let selectedWord = '';
         let wordDataset = [];
+
+        // Dữ liệu IPA cứng cho một số từ phổ biến
+        const ipaData = {
+            'hello': '/həˈloʊ/',
+            'world': '/wɜːld/',
+            'apple': '/ˈæpəl/',
+            'banana': '/bəˈnænə/',
+            'beautiful': '/ˈbjuːtəfəl/',
+            'pronunciation': '/prəˌnʌnsiˈeɪʃən/',
+            'thank you': '/ˈθæŋk juː/',
+            'welcome': '/ˈwɛlkəm/'
+        };
 
         // Kiểm tra hỗ trợ Web Speech API
         const isSpeechSynthesisSupported = 'speechSynthesis' in window;
@@ -306,6 +336,15 @@
             resultsArea.classList.add('hidden');
             renderWordList();
             updateButtonsState();
+            
+            // Hiển thị IPA
+            const ipa = getIPA(word);
+            if (ipa) {
+                ipaDisplay.textContent = ipa;
+                ipaDisplay.classList.remove('hidden');
+            } else {
+                ipaDisplay.classList.add('hidden');
+            }
         }
 
         // Hàm xóa từ
@@ -315,6 +354,7 @@
             if (selectedWord === wordToRemove) {
                 selectedWord = '';
                 selectedWordDisplay.textContent = 'Chọn một từ để bắt đầu';
+                ipaDisplay.classList.add('hidden');
                 resultsArea.classList.add('hidden');
             }
             saveWordsToLocalStorage();
@@ -330,6 +370,11 @@
             if (!isSpeechRecognitionSupported) {
                 apiUnsupportedWarning.classList.remove('hidden');
             }
+        }
+
+        // Hàm lấy IPA từ dictionary
+        function getIPA(word) {
+            return ipaData[word.toLowerCase()] || `(Không có IPA)`;
         }
 
         // Hàm tính Levenshtein distance
@@ -370,6 +415,53 @@
 
             return { score };
         }
+        
+        // Hàm tạo HTML so sánh
+        function createComparisonHtml(targetWord, spokenText) {
+            const targetWords = targetWord.toLowerCase().split(' ');
+            const spokenWords = spokenText.toLowerCase().split(' ');
+
+            let html = '';
+            let targetIndex = 0;
+
+            for (let i = 0; i < spokenWords.length; i++) {
+                const spoken = spokenWords[i];
+                const target = targetWords[targetIndex];
+
+                if (target === undefined) {
+                    html += `<span class="highlight-extra">${spoken}</span> `;
+                    continue;
+                }
+
+                if (spoken === target) {
+                    html += `<span class="highlight-correct">${spoken}</span> `;
+                    targetIndex++;
+                } else {
+                    // Simple character-level comparison for feedback
+                    let comparisonSpans = '';
+                    const minLength = Math.min(spoken.length, target.length);
+                    for (let j = 0; j < minLength; j++) {
+                        if (spoken[j] === target[j]) {
+                            comparisonSpans += `<span class="highlight-correct">${spoken[j]}</span>`;
+                        } else {
+                            comparisonSpans += `<span class="highlight-incorrect">${spoken[j]}</span>`;
+                        }
+                    }
+                    if (spoken.length > target.length) {
+                        comparisonSpans += `<span class="highlight-extra">${spoken.slice(minLength)}</span>`;
+                    }
+                    html += `${comparisonSpans} `;
+                    targetIndex++;
+                }
+            }
+
+            // Highlight missed words
+            for (let i = targetIndex; i < targetWords.length; i++) {
+                html += `<span class="highlight-incorrect">${targetWords[i]}</span> `;
+            }
+
+            return html.trim();
+        }
 
         // Hàm cập nhật giao diện kết quả
         function updateResultsUI(transcript, result) {
@@ -392,6 +484,10 @@
             scoreDisplay.textContent = result.score;
             scoreDisplay.className = `w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-md ${color}`;
             feedbackMessageDiv.innerHTML = message;
+            
+            // Cập nhật so sánh
+            const comparisonHtml = createComparisonHtml(selectedWord, transcript);
+            comparisonTextDiv.innerHTML = comparisonHtml;
         }
 
         // ============== Các sự kiện ==============
