@@ -37,6 +37,26 @@
         .highlight-extra {
             color: #fb923c; /* orange-400 */
         }
+        .feedback-item {
+            list-style: none;
+            padding-left: 0;
+        }
+        .feedback-item li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .feedback-item li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #16a34a;
+            font-weight: bold;
+        }
+        .feedback-item.has-errors li:before {
+            content: '✖';
+            color: #dc2626;
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
@@ -45,7 +65,7 @@
         <!-- Header và chức năng nhập từ -->
         <div class="flex flex-col items-center text-center space-y-4">
             <div class="flex items-center space-x-4">
-                <img src="https://scontent.fsgn16-1.fna.fbcdn.net/v/t39.30808-6/472919267_470131356146451_729434797204896135_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeE9ZTI6fgF9mTD0MyD7laeXfnuzvqEUccB-e7O-oRRxwDIaS-EDHpQHzBvfP5ea2zg62_N0eEpCNHkyzm5k46eP&_nc_ohc=6lFMDXtlVGwQ7kNvwFZPchX&_nc_oc=Adm9jx2WiHHJP81PAPZ0wg7aKKnUC-_k05rUmZjoJ5COmbps5Pdi4FYqFyQUR9INOmmhn6ZW-uUnq5QV5g3LmVDl&_nc_zt=23&_nc_ht=scontent.fsgn16-1.fna&_nc_gid=ztpM7fRjRnh3-lAg6D4kxg&oh=00_AfW9F3Z9mX7-zY6dElWdyZX_Kyte-6tcHrXIJoFgKsuTnA&oe=68A52689" alt="New Image" class="h-24 w-24 object-contain rounded-full">
+                <img src="https://placehold.co/96x96/4B5563/FFFFFF?text=Speak" alt="Logo" class="h-24 w-24 object-contain rounded-full">
                 <h1 class="text-3xl font-bold text-gray-800">Speak & Fix</h1>
             </div>
             <p class="text-gray-600 max-w-md">
@@ -99,6 +119,11 @@
                     <p class="text-base text-gray-600">So sánh với từ gốc:</p>
                     <p id="comparison-text" class="text-2xl font-bold tracking-wide"></p>
                 </div>
+                <!-- Vùng phân tích chi tiết mới -->
+                <div id="detailed-feedback-area" class="mt-4">
+                    <h4 class="text-xl font-semibold text-gray-800">Phân tích chi tiết</h4>
+                    <ul id="feedback-list" class="feedback-item mt-2"></ul>
+                </div>
             </div>
 
             <div id="api-unsupported-warning" class="bg-red-100 p-4 rounded-2xl text-red-700 hidden" role="alert">
@@ -135,6 +160,7 @@
         const feedbackMessageDiv = document.getElementById('feedback-message');
         const comparisonTextDiv = document.getElementById('comparison-text');
         const apiUnsupportedWarning = document.getElementById('api-unsupported-warning');
+        const feedbackList = document.getElementById('feedback-list');
         
         let selectedWord = '';
         let wordDataset = [];
@@ -148,7 +174,9 @@
             'beautiful': '/ˈbjuːtəfəl/',
             'pronunciation': '/prəˌnʌnsiˈeɪʃən/',
             'thank you': '/ˈθæŋk juː/',
-            'welcome': '/ˈwɛlkəm/'
+            'welcome': '/ˈwɛlkəm/',
+            'walk': '/wɔːk/',
+            'strength': '/strɛŋθ/'
         };
 
         // Kiểm tra hỗ trợ Web Speech API
@@ -182,7 +210,8 @@
                 const transcript = event.results[0][0].transcript;
                 const convertedTranscript = convertDigitsToWords(transcript);
                 const result = scorePronunciation(selectedWord, convertedTranscript);
-                updateResultsUI(convertedTranscript, result);
+                const feedback = analyzePronunciation(selectedWord, convertedTranscript);
+                updateResultsUI(convertedTranscript, result, feedback);
             };
 
             recognition.onerror = (event) => {
@@ -429,6 +458,12 @@
             const distance = levenshtein(normalizedTarget, normalizedSpoken);
             const maxLength = Math.max(normalizedTarget.length, normalizedSpoken.length);
             let score = maxLength > 0 ? Math.round((1 - distance / maxLength) * 100) : 100;
+            
+            // Add a slight penalty if the spoken text is a different word entirely
+            if (distance > normalizedTarget.length * 0.75) {
+                score -= 10;
+            }
+            score = Math.max(0, score);
 
             return { score };
         }
@@ -480,10 +515,65 @@
             return html.trim();
         }
 
+        // Hàm phân tích chi tiết phát âm
+        function analyzePronunciation(targetWord, spokenText) {
+            const feedback = [];
+            const target = targetWord.toLowerCase();
+            const spoken = spokenText.toLowerCase();
+
+            // Phân tích các trường hợp phổ biến
+            if (target.includes('th')) {
+                if (!spoken.includes('th') && spoken.includes('t') || spoken.includes('d')) {
+                    feedback.push("Cần chú ý âm 'th'. Thay vì phát âm như 't' hoặc 'd', hãy đẩy lưỡi ra giữa hai hàm răng.");
+                } else if (!spoken.includes('th')) {
+                    feedback.push("Bạn đã bỏ qua âm 'th' trong từ. Hãy thử luyện tập âm này.");
+                }
+            }
+            if (target.includes('l')) {
+                if (target.endsWith('l') && spoken.length < target.length) {
+                    // This is a simple heuristic for silent L
+                    if (target === 'walk' && spoken === 'wok') {
+                        feedback.push("Trong từ 'walk', âm 'l' là âm câm (silent). Bạn đã phát âm đúng.");
+                    } else {
+                        feedback.push("Hãy đảm bảo bạn phát âm âm 'l' ở cuối từ một cách rõ ràng, nếu không phải là âm câm.");
+                    }
+                }
+            }
+            
+            // So sánh từng từ một
+            const targetWords = targetWord.toLowerCase().split(' ');
+            const spokenWords = spokenText.toLowerCase().split(' ');
+
+            for (let i = 0; i < targetWords.length; i++) {
+                const targetW = targetWords[i];
+                const spokenW = spokenWords[i];
+                if (!spokenW) continue;
+
+                if (targetW !== spokenW) {
+                    const distance = levenshtein(targetW, spokenW);
+                    const maxLength = Math.max(targetW.length, spokenW.length);
+                    if (distance / maxLength > 0.5) {
+                        feedback.push(`Có vẻ bạn đã phát âm sai từ "${targetW}". Hãy cố gắng nghe kỹ và lặp lại.`);
+                    }
+                }
+            }
+
+            if (spokenWords.length > targetWords.length) {
+                feedback.push("Bạn đã thêm một vài từ không có trong từ gốc. Hãy chú ý hơn đến những từ cần nói.");
+            }
+            
+            if (feedback.length === 0) {
+                feedback.push("Phát âm của bạn rất tốt! Không có lỗi rõ ràng nào được phát hiện.");
+            }
+
+            return feedback;
+        }
+
         // Hàm cập nhật giao diện kết quả
-        function updateResultsUI(transcript, result) {
+        function updateResultsUI(transcript, result, feedback) {
             resultsArea.classList.remove('hidden');
             userTranscriptSpan.textContent = transcript;
+            feedbackList.innerHTML = '';
 
             let message = '';
             let color = '';
@@ -505,6 +595,23 @@
             // Cập nhật so sánh
             const comparisonHtml = createComparisonHtml(selectedWord, transcript);
             comparisonTextDiv.innerHTML = comparisonHtml;
+            
+            // Cập nhật feedback chi tiết
+            let hasErrors = false;
+            feedback.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                if (item.includes("Cần chú ý") || item.includes("bỏ qua") || item.includes("sai từ") || item.includes("thêm một vài từ")) {
+                    hasErrors = true;
+                }
+                feedbackList.appendChild(li);
+            });
+
+            if (hasErrors) {
+                feedbackList.classList.add('has-errors');
+            } else {
+                feedbackList.classList.remove('has-errors');
+            }
         }
 
         // ============== Các sự kiện ==============
