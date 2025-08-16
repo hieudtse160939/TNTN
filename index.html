@@ -55,7 +55,10 @@
         }
         .feedback-item.has-errors li:before {
             content: '✖';
+            position: absolute;
+            left: 0;
             color: #dc2626;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -69,10 +72,10 @@
                 <h1 class="text-3xl font-bold text-gray-800">Speak & Fix</h1>
             </div>
             <p class="text-gray-600 max-w-md">
-                Nhập từ hoặc câu bạn muốn luyện phát âm, sau đó chọn từ để bắt đầu.
+                Nhập từ hoặc số (bằng số) bạn muốn luyện phát âm, sau đó chọn từ để bắt đầu.
             </p>
             <div class="w-full flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
-                <textarea id="word-input" class="w-full md:w-2/3 p-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" rows="2" placeholder="Nhập từ hoặc câu... (ví dụ: hello, world, you are handsome)"></textarea>
+                <textarea id="word-input" class="w-full md:w-2/3 p-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" rows="2" placeholder="Nhập từ hoặc số của bạn... (ví dụ: hello, 123, world)"></textarea>
                 <div class="w-full md:w-1/3 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
                     <button id="add-words-btn" class="flex-1 bg-blue-600 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg hover:bg-blue-700 transition-all">Thêm từ</button>
                     <button id="clear-all-btn" class="flex-1 bg-gray-400 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg hover:bg-gray-500 transition-all">Xóa tất cả</button>
@@ -87,7 +90,7 @@
                 <!-- Từ sẽ được hiển thị ở đây -->
             </div>
         </div>
-
+        
         <!-- Khu vực luyện phát âm và kết quả -->
         <div class="flex flex-col space-y-6 items-center">
             <div class="bg-blue-50 p-6 rounded-2xl shadow-inner flex flex-col items-center justify-center space-y-4 w-full">
@@ -96,15 +99,15 @@
                 </p>
                 <p id="ipa-display" class="text-xl font-medium text-gray-600 italic hidden"></p>
                 <div class="flex space-x-4">
-                    <button id="speak-btn" class="bg-green-500 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg hover:bg-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled aria-label="Nghe phát âm mẫu (phím tắt: Enter)">
+                    <button id="speak-btn" class="bg-green-500 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg hover:bg-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed" aria-label="Nghe phát âm mẫu (phím tắt: Enter)">
                         <span class="text-xl">🔊</span> Nghe mẫu
                     </button>
-                    <button id="record-btn" class="bg-red-500 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg hover:bg-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled aria-label="Luyện nói (phím tắt: Space)">
+                    <button id="record-btn" class="bg-red-500 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg hover:bg-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed" aria-label="Luyện nói (phím tắt: Space)">
                         <span class="text-xl">🎙️</span> Luyện nói
                     </button>
                 </div>
             </div>
-
+            
             <div id="results-area" class="bg-white p-6 rounded-2xl shadow-inner space-y-4 w-full hidden">
                 <h3 class="text-2xl font-bold text-gray-800">Kết quả của bạn</h3>
                 <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
@@ -115,14 +118,30 @@
                     </div>
                 </div>
                 <div id="feedback-message" class="text-lg text-gray-700 mt-2 text-center md:text-left"></div>
-                <div id="comparison-area" class="mt-4 text-center md:text-left">
-                    <p class="text-base text-gray-600">So sánh với từ gốc:</p>
-                    <p id="comparison-text" class="text-2xl font-bold tracking-wide"></p>
-                </div>
                 <!-- Vùng phân tích chi tiết mới -->
                 <div id="detailed-feedback-area" class="mt-4">
                     <h4 class="text-xl font-semibold text-gray-800">Phân tích chi tiết</h4>
                     <ul id="feedback-list" class="feedback-item mt-2"></ul>
+                </div>
+            </div>
+
+            <!-- New section for example sentences -->
+            <div id="example-sentences-area" class="bg-white p-6 rounded-2xl shadow-inner space-y-4 w-full hidden">
+                <h3 class="text-2xl font-bold text-gray-800">Câu ví dụ</h3>
+                <div class="flex items-center space-x-4">
+                    <label for="num-sentences" class="text-lg text-gray-700">Số lượng câu:</label>
+                    <!-- Giới hạn số câu tối đa là 10 -->
+                    <input type="number" id="num-sentences" value="3" min="1" max="10" class="w-20 p-2 border border-gray-300 rounded-lg text-center">
+                    <button id="generate-sentences-btn" class="bg-purple-600 text-white font-semibold py-2 px-4 rounded-2xl shadow-lg hover:bg-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                        Tạo
+                    </button>
+                </div>
+                <!-- Vùng hiển thị cảnh báo mới -->
+                <p id="sentence-warning" class="text-red-500 italic text-sm mt-2 hidden">
+                    Vui lòng nhập một số nhỏ hơn hoặc bằng 10.
+                </p>
+                <div id="sentences-output" class="space-y-2 mt-4 text-gray-700">
+                    <p id="sentences-placeholder">Nhấn 'Tạo' để nhận các câu ví dụ.</p>
                 </div>
             </div>
 
@@ -158,13 +177,19 @@
         const userTranscriptSpan = document.getElementById('user-transcript');
         const scoreDisplay = document.getElementById('score-display');
         const feedbackMessageDiv = document.getElementById('feedback-message');
-        const comparisonTextDiv = document.getElementById('comparison-text');
         const apiUnsupportedWarning = document.getElementById('api-unsupported-warning');
         const feedbackList = document.getElementById('feedback-list');
-        
+
+        // Các phần tử mới cho tính năng tạo câu ví dụ
+        const exampleSentencesArea = document.getElementById('example-sentences-area');
+        const numSentencesInput = document.getElementById('num-sentences');
+        const generateSentencesBtn = document.getElementById('generate-sentences-btn');
+        const sentencesOutput = document.getElementById('sentences-output');
+        const sentenceWarning = document.getElementById('sentence-warning'); // New element for warning
+
         let selectedWord = '';
         let wordDataset = [];
-
+        
         // Dữ liệu IPA cứng cho một số từ phổ biến
         const ipaData = {
             'hello': '/həˈloʊ/',
@@ -178,7 +203,7 @@
             'walk': '/wɔːk/',
             'strength': '/strɛŋθ/'
         };
-
+        
         // Kiểm tra hỗ trợ Web Speech API
         const isSpeechSynthesisSupported = 'speechSynthesis' in window;
         const isSpeechRecognitionSupported = 'webkitSpeechRecognition' in window;
@@ -187,7 +212,8 @@
         let recognition = null;
         if (isSpeechRecognitionSupported) {
             recognition = new webkitSpeechRecognition();
-            recognition.lang = 'en-US';
+            // Đảm bảo ngôn ngữ luôn là tiếng Anh
+            recognition.lang = 'en-US'; 
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
 
@@ -209,8 +235,15 @@
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
                 const convertedTranscript = convertDigitsToWords(transcript);
-                const result = scorePronunciation(selectedWord, convertedTranscript);
-                const feedback = analyzePronunciation(selectedWord, convertedTranscript);
+                
+                // Lấy từ đích đã được xử lý (số -> chữ) để so sánh
+                let targetToCompare = selectedWord;
+                if (!isNaN(selectedWord) && isFinite(selectedWord)) {
+                    targetToCompare = convertNumberToWords(parseInt(selectedWord));
+                }
+
+                const result = scorePronunciation(targetToCompare, convertedTranscript);
+                const feedback = analyzePronunciation(targetToCompare, convertedTranscript);
                 updateResultsUI(convertedTranscript, result, feedback);
             };
 
@@ -233,25 +266,29 @@
         // Hàm chuyển đổi số thành chữ cái
         function convertNumberToWords(num) {
             if (num === 0) return 'zero';
+            if (num > 999999999) return num.toString(); // Giới hạn xử lý cho số lớn
 
             const units = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
             const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
             const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
 
-            function convertThreeDigitsToWords(n) {
+            function convertBelow1000(n) {
                 if (n === 0) return '';
                 if (n < 10) return units[n];
                 if (n < 20) return teens[n - 10];
-                if (n < 100) {
-                    const ten = Math.floor(n / 10);
-                    const unit = n % 10;
-                    return tens[ten] + (unit > 0 ? '-' + units[unit] : '');
-                }
                 const hundred = Math.floor(n / 100);
                 const remainder = n % 100;
-                let result = units[hundred] + ' hundred';
+                let result = hundred > 0 ? units[hundred] + ' hundred' : '';
                 if (remainder > 0) {
-                    result += ' and ' + convertThreeDigitsToWords(remainder);
+                    if (result !== '') result += ' and ';
+                    if (remainder < 20) {
+                        result += teens[remainder - 10];
+                    } else {
+                        const ten = Math.floor(remainder / 10);
+                        const unit = remainder % 10;
+                        result += tens[ten];
+                        if (unit > 0) result += '-' + units[unit];
+                    }
                 }
                 return result;
             }
@@ -260,27 +297,21 @@
             let isNegative = false;
             if (num < 0) {
                 isNegative = true;
-                num = -num;
+                num = Math.abs(num);
             }
+            
+            const millions = Math.floor(num / 1000000);
+            const thousands = Math.floor((num % 1000000) / 1000);
+            const hundreds = num % 1000;
 
-            if (num < 1000) {
-                words = convertThreeDigitsToWords(num);
-            } else if (num < 1000000) {
-                const thousands = Math.floor(num / 1000);
-                const remainder = num % 1000;
-                words = convertNumberToWords(thousands) + ' thousand';
-                if (remainder > 0) {
-                    words += ' ' + convertNumberToWords(remainder);
-                }
-            } else if (num < 1000000000) {
-                const millions = Math.floor(num / 1000000);
-                const remainder = num % 1000000;
-                words = convertNumberToWords(millions) + ' million';
-                if (remainder > 0) {
-                    words += ' ' + convertNumberToWords(remainder);
-                }
-            } else {
-                return num.toString();
+            if (millions > 0) {
+                words += convertBelow1000(millions) + ' million ';
+            }
+            if (thousands > 0) {
+                words += convertBelow1000(thousands) + ' thousand ';
+            }
+            if (hundreds > 0) {
+                words += convertBelow1000(hundreds);
             }
             
             return (isNegative ? 'negative ' : '') + words.trim();
@@ -289,7 +320,6 @@
         function convertDigitsToWords(text) {
             let words = text.split(' ');
             let convertedWords = [];
-
             words.forEach(word => {
                 const num = parseInt(word);
                 if (!isNaN(num) && isFinite(word)) {
@@ -362,22 +392,31 @@
             updateButtonsState();
         }
 
+        // Hàm lấy IPA từ dictionary
+        function getIPA(word) {
+            return ipaData[word.toLowerCase()] || `(Không có IPA)`;
+        }
+
         // Hàm chọn từ
         function selectWord(word) {
             selectedWord = word;
             selectedWordDisplay.textContent = word;
             resultsArea.classList.add('hidden');
+            exampleSentencesArea.classList.remove('hidden');
             renderWordList();
             updateButtonsState();
             
             // Hiển thị IPA
             const ipa = getIPA(word);
-            if (ipa) {
+            if (ipa && ipa !== '(Không có IPA)') {
                 ipaDisplay.textContent = ipa;
                 ipaDisplay.classList.remove('hidden');
             } else {
                 ipaDisplay.classList.add('hidden');
             }
+            
+            // Clear example sentences on word change
+            sentencesOutput.innerHTML = '<p id="sentences-placeholder">Nhấn \'Tạo\' để nhận các câu ví dụ.</p>';
         }
 
         // Hàm xóa từ
@@ -389,6 +428,7 @@
                 selectedWordDisplay.textContent = 'Chọn một từ để bắt đầu';
                 ipaDisplay.classList.add('hidden');
                 resultsArea.classList.add('hidden');
+                exampleSentencesArea.classList.add('hidden');
             }
             saveWordsToLocalStorage();
             renderWordList();
@@ -403,6 +443,7 @@
             selectedWordDisplay.textContent = 'Chọn một từ để bắt đầu';
             ipaDisplay.classList.add('hidden');
             resultsArea.classList.add('hidden');
+            exampleSentencesArea.classList.add('hidden');
             showToast("Đã xóa tất cả các từ.", 3000);
         }
 
@@ -411,16 +452,12 @@
             const isWordSelected = selectedWord.length > 0;
             speakBtn.disabled = !isWordSelected || !isSpeechSynthesisSupported;
             recordBtn.disabled = !isWordSelected || !isSpeechRecognitionSupported;
+            generateSentencesBtn.disabled = !isWordSelected;
             clearAllBtn.disabled = wordDataset.length === 0;
 
             if (!isSpeechRecognitionSupported) {
                 apiUnsupportedWarning.classList.remove('hidden');
             }
-        }
-
-        // Hàm lấy IPA từ dictionary
-        function getIPA(word) {
-            return ipaData[word.toLowerCase()] || `(Không có IPA)`;
         }
 
         // Hàm tính Levenshtein distance
@@ -447,19 +484,13 @@
 
         // Hàm so sánh và chấm điểm
         function scorePronunciation(targetWord, spokenText) {
-            let processedTarget = targetWord;
-            if (!isNaN(targetWord) && isFinite(targetWord)) {
-                processedTarget = convertDigitsToWords(targetWord);
-            }
-
-            const normalizedTarget = processedTarget.toLowerCase().replace(/[^a-z]/g, '');
+            const normalizedTarget = targetWord.toLowerCase().replace(/[^a-z]/g, '');
             const normalizedSpoken = spokenText.toLowerCase().replace(/[^a-z]/g, '');
 
             const distance = levenshtein(normalizedTarget, normalizedSpoken);
             const maxLength = Math.max(normalizedTarget.length, normalizedSpoken.length);
             let score = maxLength > 0 ? Math.round((1 - distance / maxLength) * 100) : 100;
             
-            // Add a slight penalty if the spoken text is a different word entirely
             if (distance > normalizedTarget.length * 0.75) {
                 score -= 10;
             }
@@ -468,60 +499,12 @@
             return { score };
         }
         
-        // Hàm tạo HTML so sánh
-        function createComparisonHtml(targetWord, spokenText) {
-            const targetWords = targetWord.toLowerCase().split(' ');
-            const spokenWords = spokenText.toLowerCase().split(' ');
-
-            let html = '';
-            let targetIndex = 0;
-
-            for (let i = 0; i < spokenWords.length; i++) {
-                const spoken = spokenWords[i];
-                const target = targetWords[targetIndex];
-
-                if (target === undefined) {
-                    html += `<span class="highlight-extra">${spoken}</span> `;
-                    continue;
-                }
-
-                if (spoken === target) {
-                    html += `<span class="highlight-correct">${spoken}</span> `;
-                    targetIndex++;
-                } else {
-                    // So sánh ký tự để đưa ra phản hồi chi tiết
-                    let comparisonSpans = '';
-                    const minLength = Math.min(spoken.length, target.length);
-                    for (let j = 0; j < minLength; j++) {
-                        if (spoken[j] === target[j]) {
-                            comparisonSpans += `<span class="highlight-correct">${spoken[j]}</span>`;
-                        } else {
-                            comparisonSpans += `<span class="highlight-incorrect">${spoken[j]}</span>`;
-                        }
-                    }
-                    if (spoken.length > target.length) {
-                        comparisonSpans += `<span class="highlight-extra">${spoken.slice(minLength)}</span>`;
-                    }
-                    html += `${comparisonSpans} `;
-                    targetIndex++;
-                }
-            }
-
-            // Gạch chân các từ bị thiếu trong phần nói của bạn
-            for (let i = targetIndex; i < targetWords.length; i++) {
-                html += `<span class="highlight-incorrect">${targetWords[i]}</span> `;
-            }
-
-            return html.trim();
-        }
-
         // Hàm phân tích chi tiết phát âm
         function analyzePronunciation(targetWord, spokenText) {
             const feedback = [];
             const target = targetWord.toLowerCase();
             const spoken = spokenText.toLowerCase();
 
-            // Phân tích các trường hợp phổ biến
             if (target.includes('th')) {
                 if (!spoken.includes('th') && spoken.includes('t') || spoken.includes('d')) {
                     feedback.push("Cần chú ý âm 'th'. Thay vì phát âm như 't' hoặc 'd', hãy đẩy lưỡi ra giữa hai hàm răng.");
@@ -531,7 +514,6 @@
             }
             if (target.includes('l')) {
                 if (target.endsWith('l') && spoken.length < target.length) {
-                    // This is a simple heuristic for silent L
                     if (target === 'walk' && spoken === 'wok') {
                         feedback.push("Trong từ 'walk', âm 'l' là âm câm (silent). Bạn đã phát âm đúng.");
                     } else {
@@ -540,7 +522,6 @@
                 }
             }
             
-            // So sánh từng từ một
             const targetWords = targetWord.toLowerCase().split(' ');
             const spokenWords = spokenText.toLowerCase().split(' ');
 
@@ -592,10 +573,6 @@
             scoreDisplay.className = `w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-md ${color}`;
             feedbackMessageDiv.innerHTML = message;
             
-            // Cập nhật so sánh
-            const comparisonHtml = createComparisonHtml(selectedWord, transcript);
-            comparisonTextDiv.innerHTML = comparisonHtml;
-            
             // Cập nhật feedback chi tiết
             let hasErrors = false;
             feedback.forEach(item => {
@@ -614,20 +591,111 @@
             }
         }
 
+        // Hàm gọi API Gemini để tạo câu ví dụ
+        async function generateExampleSentences() {
+            const numSentences = parseInt(numSentencesInput.value);
+            const word = selectedWord;
+
+            // Kiểm tra giới hạn số câu
+            if (numSentences > 10) {
+                sentenceWarning.classList.remove('hidden');
+                showToast("Số lượng câu không được lớn hơn 10.");
+                return;
+            } else {
+                sentenceWarning.classList.add('hidden');
+            }
+
+            if (!word || numSentences < 1) {
+                showToast("Vui lòng chọn một từ và nhập số lượng câu hợp lệ.");
+                return;
+            }
+
+            sentencesOutput.innerHTML = '<p class="text-gray-500 italic">Đang tạo câu ví dụ...</p>';
+            generateSentencesBtn.disabled = true;
+
+            try {
+                const prompt = `Generate ${numSentences} simple English example sentences for the word "${word}". The sentences should be grammatically correct and use the word in different contexts if possible. Provide only the sentences, one per line, with a number at the beginning of each line (e.g., "1. Sentence one.").`;
+
+                const chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API call failed with status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    
+                    const text = result.candidates[0].content.parts[0].text;
+                    const sentences = text.split('\n').filter(s => s.trim().length > 0);
+                    
+                    sentencesOutput.innerHTML = '';
+                    sentences.forEach(sentence => {
+                        const p = document.createElement('p');
+                        p.textContent = sentence.trim();
+                        sentencesOutput.appendChild(p);
+                    });
+
+                } else {
+                    sentencesOutput.innerHTML = '<p class="text-red-500 italic">Không thể tạo câu ví dụ. Vui lòng thử lại sau.</p>';
+                    console.error("Unexpected API response structure:", result);
+                }
+
+            } catch (error) {
+                sentencesOutput.innerHTML = '<p class="text-red-500 italic">Đã xảy ra lỗi khi tạo câu ví dụ. Vui lòng thử lại.</p>';
+                console.error("Error generating sentences:", error);
+            } finally {
+                generateSentencesBtn.disabled = false;
+            }
+        }
+
         // ============== Các sự kiện ==============
 
         // Nút Thêm từ
         addWordsBtn.addEventListener('click', () => {
             const newWords = wordInput.value
                 .split(/,|\n/)
-                .map(word => word.trim().toLowerCase())
-                .filter(word => word.length > 0);
+                .map(phrase => {
+                    let correctedPhrase = phrase.trim();
+                    if (correctedPhrase.length === 0) return null;
+
+                    // Chuyển " i " thành " I " (có khoảng trắng)
+                    correctedPhrase = correctedPhrase.replace(/(\s)i(\s)/g, '$1I$2');
+
+                    // Chuyển "i " thành "I " ở đầu câu
+                    if (correctedPhrase.startsWith('i ')) {
+                        correctedPhrase = 'I' + correctedPhrase.substring(1);
+                    }
+                    
+                    // Chuyển "i" thành "I" nếu nó là một từ độc lập
+                    if (correctedPhrase.toLowerCase() === 'i') {
+                        correctedPhrase = 'I';
+                    }
+
+                    return correctedPhrase;
+                })
+                .filter(phrase => phrase && phrase.length > 0);
             
             if (newWords.length > 0) {
                 wordDataset = [...new Set([...wordDataset, ...newWords])];
                 wordInput.value = '';
                 saveWordsToLocalStorage();
                 renderWordList();
+                showToast(`Đã thêm ${newWords.length} từ vào danh sách.`, 3000);
+            } else {
+                showToast("Vui lòng nhập từ hợp lệ.", 3000);
             }
         });
 
@@ -636,34 +704,55 @@
 
         // Nút Nghe mẫu
         speakBtn.addEventListener('click', () => {
-            if (selectedWord && isSpeechSynthesisSupported) {
+            if (isSpeechSynthesisSupported) {
+                // Sử dụng từ gốc (ví dụ: "123") để đọc
                 const utterance = new SpeechSynthesisUtterance(selectedWord);
-                utterance.lang = 'en-US';
+                
+                // Lấy danh sách giọng nói và tìm giọng tiếng Anh (en-US)
+                const voices = window.speechSynthesis.getVoices();
+                const englishVoice = voices.find(voice => voice.lang.startsWith('en-'));
+                
+                // Nếu tìm thấy, đặt giọng nói là tiếng Anh
+                if (englishVoice) {
+                    utterance.voice = englishVoice;
+                } else {
+                    console.warn("Không tìm thấy giọng nói tiếng Anh. Sử dụng giọng mặc định.");
+                }
+                
+                // Bắt đầu đọc
                 window.speechSynthesis.speak(utterance);
             } else {
                 showToast("Tính năng này không được hỗ trợ trên trình duyệt của bạn.", 3000);
             }
         });
 
-        // Nút Ghi âm
+        // Nút Luyện nói
         recordBtn.addEventListener('click', () => {
-            if (selectedWord && isSpeechRecognitionSupported) {
-                try {
-                    recognition.start();
-                } catch (e) {
-                    console.error("Failed to start speech recognition:", e);
-                    showToast("Đã có phiên ghi âm đang hoạt động hoặc xảy ra lỗi. Vui lòng thử lại sau.", 5000);
-                }
+            if (isSpeechRecognitionSupported) {
+                recognition.start();
             } else {
                 showToast("Tính năng này không được hỗ trợ trên trình duyệt của bạn.", 3000);
             }
         });
 
-        // Tải dữ liệu khi trang được tải
-        window.addEventListener('load', () => {
-            loadWordsFromLocalStorage();
-            updateButtonsState();
+        // Nút Tạo câu ví dụ
+        generateSentencesBtn.addEventListener('click', generateExampleSentences);
+
+        // Phím tắt bàn phím
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !recordBtn.disabled) {
+                e.preventDefault();
+                recordBtn.click();
+            } else if (e.code === 'Enter' && !speakBtn.disabled && document.activeElement !== wordInput) {
+                e.preventDefault();
+                speakBtn.click();
+            }
         });
+
+        // Tải dữ liệu khi trang web được tải
+        window.onload = () => {
+            loadWordsFromLocalStorage();
+        };
     </script>
 </body>
 </html>
