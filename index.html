@@ -34,6 +34,7 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
+            cursor: pointer; /* Add cursor pointer to indicate interactivity */
         }
 
         .moon {
@@ -48,7 +49,7 @@
             transform: translateX(-50%);
             animation: moon-glow 5s infinite alternate;
         }
-        /* Thêm các miệng núi lửa cho mặt trăng */
+        /* Add craters to the moon */
         .moon::before, .moon::after {
             content: '';
             position: absolute;
@@ -74,6 +75,7 @@
             height: 100%;
             top: 0;
             left: 0;
+            pointer-events: none; /* Make sure stars don't interfere with clicks */
         }
 
         .star {
@@ -94,6 +96,7 @@
             border-radius: 15px;
             animation: fadeIn 3s ease-in-out;
             max-width: 90%;
+            pointer-events: none; /* Prevent card from blocking clicks on the sky */
         }
 
         .greeting-card h1 {
@@ -116,7 +119,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none; /* Cho phép click xuyên qua */
+            pointer-events: none; /* Allow clicks to pass through */
         }
 
         .lantern {
@@ -133,7 +136,7 @@
             background-color: var(--lantern-yellow);
         }
 
-        .lantern::before { /* Dây treo */
+        .lantern::before { /* String */
             content: '';
             position: absolute;
             top: -50px;
@@ -143,7 +146,7 @@
             background-color: #333;
             transform: translateX(-50%);
         }
-        .lantern::after { /* Tua rua */
+        .lantern::after { /* Tassel */
             content: '';
             position: absolute;
             bottom: -30px;
@@ -154,15 +157,15 @@
             background: linear-gradient(to bottom, gold, orangered);
         }
         
-        /* Vị trí các lồng đèn */
+        /* Lantern positions */
         .lantern-1 { top: 5%; left: 15%; animation-duration: 4.5s; }
         .lantern-2 { top: 10%; left: 80%; animation-duration: 3.8s; }
         .lantern-3 { top: 20%; left: 5%; animation-duration: 5s; transform: scale(0.8); }
 
-        /* Lồng đèn trời bay lên */
+        /* Flying lanterns */
         .flying-lantern {
             position: absolute;
-            bottom: -100px; /* Bắt đầu từ bên dưới màn hình */
+            bottom: -100px; /* Start from below the screen */
             width: 40px;
             height: 60px;
             background: radial-gradient(circle at 50% 100%, #ffc947, #ff9a00);
@@ -170,7 +173,23 @@
             opacity: 0;
             animation: flyUp linear infinite;
         }
-
+        
+        /* Firework effect styles */
+        .firework {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            animation: explode 1s ease-out forwards;
+        }
+        
         /* Keyframes Animations */
         @keyframes moon-glow {
             from { box-shadow: 0 0 50px var(--moon-color), 0 0 100px var(--moon-color), 0 0 150px #fff; }
@@ -198,19 +217,30 @@
                 opacity: 0.8;
             }
             10% {
-                 opacity: 1;
+                opacity: 1;
             }
             100% {
                 transform: translateY(-120vh) translateX(50px) scale(0.3);
                 opacity: 0;
             }
         }
+        
+        @keyframes explode {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x), var(--y)) scale(0);
+                opacity: 0;
+            }
+        }
 
-        /* Thêm CSS cho hộp quà và trái tim */
+        /* CSS for gift box and heart */
         .gift-box {
             position: absolute;
             bottom: 25px;
-            left: 25px; /* Đổi sang góc trái */
+            left: 25px; /* Moved to the left corner */
             width: 60px;
             height: 60px;
             cursor: pointer;
@@ -233,7 +263,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.6);
-            display: none; /* Ẩn mặc định */
+            display: none; /* Hidden by default */
             justify-content: center;
             align-items: center;
             z-index: 100;
@@ -248,23 +278,25 @@
 
         .heart {
             position: relative;
-            width: 100px;
-            height: 90px;
-            animation: beat 1s infinite;
-            transform: scale(2.5); /* Tăng kích thước trái tim */
+            width: 280px;
+            height: 260px;
+            animation: beat 1.2s infinite ease-in-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .heart::before,
         .heart::after {
             content: "";
             position: absolute;
             top: 0;
-            width: 52px;
-            height: 80px;
-            border-radius: 50px 50px 0 0;
+            width: 150px;
+            height: 240px;
+            border-radius: 80px 80px 0 0;
             background: #e0245e;
         }
         .heart::before {
-            left: 50px;
+            left: 140px; /* Half of heart's width */
             transform: rotate(-45deg);
             transform-origin: 0 100%;
         }
@@ -274,9 +306,23 @@
             transform-origin: 100% 100%;
         }
 
+        .heart-message {
+            position: relative; /* To appear above pseudo-elements */
+            z-index: 1;
+            color: #fff;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 600;
+            line-height: 1.5;
+            padding: 20px;
+            max-width: 90%;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+            transform: translateY(-22px);
+        }
+
         @keyframes beat {
-            0%, 100% { transform: scale(2.5); } /* Tăng kích thước trái tim */
-            50% { transform: scale(2.7); } /* Làm hiệu ứng đập rõ hơn */
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
     </style>
 </head>
@@ -289,19 +335,21 @@
         <div class="greeting-card">
             <h1>Gửi Thảo Nguyên xinh đẹp,</h1>
             <p>
-                Dưới ánh trăng tròn vành vạnh đêm nay, chúc em có một mùa Tết Trung Thu thật an yên, ngập tràn tiếng cười và ấm áp bên gia đình, bè bạn. <br>
-                Mong rằng ánh sáng lấp lánh của những chiếc lồng đèn sẽ dẫn lối cho mọi ước mơ của em bay cao, bay xa. <br>
-                Chúc cho cuộc sống em luôn ngọt ngào như miếng bánh nướng và rạng rỡ như ánh trăng rằm!
+                Dưới ánh trăng tròn vành vạnh đêm nay, mình chúc bạn có một mùa Tết Trung Thu thật an yên, ngập tràn tiếng cười và ấm áp bên gia đình, bè bạn. <br>
+                Mong rằng ánh sáng lấp lánh của những chiếc lồng đèn sẽ dẫn lối cho mọi ước mơ của bạn bay cao, bay xa. <br>
+                Chúc cho cuộc sống bạn luôn ngọt ngào như miếng bánh nướng và rạng rỡ như ánh trăng rằm nhé!
+                <br><br>
+                <em style="font-size: 0.9em; opacity: 0.8;">(Thử click lên bầu trời xem có điều bất ngờ gì nhé!)</em>
             </p>
         </div>
 
         <div class="lantern-container">
-            <!-- Lồng đèn treo -->
+            <!-- Hanging lanterns -->
             <div class="lantern lantern-1 yellow"></div>
             <div class="lantern lantern-2"></div>
             <div class="lantern lantern-3 yellow"></div>
 
-            <!-- Lồng đèn trời bay lên -->
+            <!-- Flying lanterns -->
             <div class="flying-lantern" style="left: 10%; animation-duration: 20s; animation-delay: 0s;"></div>
             <div class="flying-lantern" style="left: 30%; animation-duration: 15s; animation-delay: 3s; transform: scale(0.8);"></div>
             <div class="flying-lantern" style="left: 55%; animation-duration: 25s; animation-delay: 1s;"></div>
@@ -310,24 +358,26 @@
         </div>
     </div>
     
-    <!-- Hộp quà và hiệu ứng trái tim -->
+    <!-- Gift box and heart effect -->
     <div class="gift-box" id="giftBox">
-         <!-- SVG icon cho hộp quà -->
+        <!-- SVG icon for gift box -->
         <svg fill="#f9ca24" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>gift</title> <path d="M26.899 10.021l-10.389-4.329c-0.291-0.12-0.631-0.12-0.922 0l-10.389 4.329c-0.342 0.142-0.559 0.48-0.559 0.852v3.523l-0.001 0.001h-0.64c-0.552 0-1 0.448-1 1v2c0 0.552 0.448 1 1 1h0.64v7.604c0 0.552 0.448 1 1 1h22c0.552 0 1-0.448 1-1v-7.604h0.64c0.552 0 1-0.448 1-1v-2c0-0.552-0.448-1-1-1h-0.64l0.001-0.001v-3.523c0-0.372-0.217-0.709-0.559-0.852zM16 7.185l8.369 3.487h-16.739l8.369-3.487zM5.18 12.361h21.64v1.278h-21.64v-1.278zM26 27.243h-20v-11.604h20v11.604zM18.818 10.685c-0.493-0.787-1.309-1.325-2.259-1.474-0.158-0.025-0.318-0.038-0.479-0.038-0.771 0-1.493 0.283-2.072 0.778-0.985 0.84-1.355 2.223-0.862 3.393l0.020 0.047 3.394 6.787 3.394-6.787 0.020-0.047c0.493-1.17-0.015-2.553-0.862-3.393z"></path> </g></svg>
     </div>
 
     <div class="heart-container" id="heartContainer">
-        <div class="heart"></div>
+        <div class="heart">
+            <div class="heart-message">Chúc em mãi xinh đẹp, nhiều tiền và thành công trên con đường mà em chọn</div>
+        </div>
     </div>
 
-    <!-- Nhạc nền Trung Thu -->
+    <!-- Mid-Autumn background music -->
     <audio controls autoplay loop style="display:none;">
         <source src="https://f9-stream.nixcdn.com/stream/1695886918512/2023/09/28/0/0/2/8/1695886918512.mp3?rt=jV2UDBsC4S2eK1A-iKdiuQ&pk=1695886918512&path=2023/09/28/0/0/2/8/1695886918512.mp3" type="audio/mpeg">
-        Trình duyệt của bạn không hỗ trợ phát nhạc.
+        Your browser does not support audio playback.
     </audio>
 
     <script>
-        // Tạo các ngôi sao ngẫu nhiên
+        // Create random stars
         const starsContainer = document.querySelector('.stars');
         const numStars = 150;
 
@@ -344,22 +394,67 @@
             starsContainer.appendChild(star);
         }
 
-        // Xử lý sự kiện click hộp quà
+        // Handle gift box click event
         const giftBox = document.getElementById('giftBox');
         const heartContainer = document.getElementById('heartContainer');
 
         giftBox.addEventListener('click', (event) => {
-            event.stopPropagation(); // Ngăn sự kiện click lan ra ngoài
+            event.stopPropagation(); // Prevent the click from bubbling up
             heartContainer.classList.add('visible');
         });
 
         heartContainer.addEventListener('click', () => {
-            // Ẩn trái tim khi click vào nền mờ
+            // Hide the heart when clicking on the background
             heartContainer.classList.remove('visible');
         });
+
+        // --- NEW: Firework effect on click ---
+        const nightSky = document.querySelector('.night-sky');
+
+        nightSky.addEventListener('click', (e) => {
+            // Do not create fireworks if the heart container is visible
+            if (!heartContainer.classList.contains('visible')) {
+                 createFirework(e.clientX, e.clientY);
+            }
+        });
+
+        function createFirework(x, y) {
+            const firework = document.createElement('div');
+            firework.classList.add('firework');
+            firework.style.left = x + 'px';
+            firework.style.top = y + 'px';
+            document.body.appendChild(firework);
+
+            const particleCount = 30;
+            const colors = ['#ffd700', '#d92b2b', '#f5b700', '#ffffff', '#ffc947'];
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Use polar coordinates for a circular explosion
+                const angle = Math.random() * Math.PI * 2;
+                const radius = Math.random() * 100 + 50; // Explosion radius
+
+                // Set custom properties for the animation
+                particle.style.setProperty('--x', Math.cos(angle) * radius + 'px');
+                particle.style.setProperty('--y', Math.sin(angle) * radius + 'px');
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+                firework.appendChild(particle);
+            }
+
+            // Remove the firework element after the animation ends to clean up the DOM
+            setTimeout(() => {
+                firework.remove();
+            }, 1000); 
+        }
+
     </script>
 
 </body>
 </html>
+
+
 
 
