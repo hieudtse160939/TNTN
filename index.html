@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-
     <style>
         :root {
             --moon-color: #f7f3e1;
@@ -48,6 +47,25 @@
             left: 50%;
             transform: translateX(-50%);
             animation: moon-glow 5s infinite alternate;
+        }
+        /* Thêm các miệng núi lửa cho mặt trăng */
+        .moon::before, .moon::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.1);
+        }
+        .moon::before {
+            width: 30px;
+            height: 30px;
+            top: 20px;
+            right: 30px;
+        }
+        .moon::after {
+            width: 50px;
+            height: 50px;
+            bottom: 25px;
+            left: 20px;
         }
 
         .stars {
@@ -98,7 +116,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
+            pointer-events: none; /* Cho phép click xuyên qua */
         }
 
         .lantern {
@@ -111,9 +129,11 @@
             animation: swing 4s infinite ease-in-out;
             transform-origin: top center;
         }
-        .lantern.yellow { background-color: var(--lantern-yellow); }
+        .lantern.yellow {
+            background-color: var(--lantern-yellow);
+        }
 
-        .lantern::before {
+        .lantern::before { /* Dây treo */
             content: '';
             position: absolute;
             top: -50px;
@@ -123,7 +143,7 @@
             background-color: #333;
             transform: translateX(-50%);
         }
-        .lantern::after {
+        .lantern::after { /* Tua rua */
             content: '';
             position: absolute;
             bottom: -30px;
@@ -133,80 +153,25 @@
             height: 30px;
             background: linear-gradient(to bottom, gold, orangered);
         }
-
+        
+        /* Vị trí các lồng đèn */
         .lantern-1 { top: 5%; left: 15%; animation-duration: 4.5s; }
         .lantern-2 { top: 10%; left: 80%; animation-duration: 3.8s; }
         .lantern-3 { top: 20%; left: 5%; animation-duration: 5s; transform: scale(0.8); }
 
-        /* Hộp quà */
-        .gift-box {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            width: 60px;
+        /* Lồng đèn trời bay lên */
+        .flying-lantern {
+            position: absolute;
+            bottom: -100px; /* Bắt đầu từ bên dưới màn hình */
+            width: 40px;
             height: 60px;
-            background: url('https://cdn-icons-png.flaticon.com/512/2092/2092660.png') no-repeat center/contain;
-            cursor: pointer;
-            transition: transform 0.3s;
-            z-index: 20;
-        }
-        .gift-box:hover { transform: scale(1.1) rotate(-5deg); }
-
-        /* Trái tim và chữ bên trong */
-        .heart-message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            text-align: center;
+            background: radial-gradient(circle at 50% 100%, #ffc947, #ff9a00);
+            border-radius: 50% 50% 30% 30% / 60% 60% 40% 40%;
             opacity: 0;
-            z-index: 30;
-            transition: all 0.6s ease;
+            animation: flyUp linear infinite;
         }
 
-        .heart {
-            width: 180px;
-            height: 180px;
-            position: relative;
-            margin: 0 auto;
-            background: red;
-            transform: rotate(-45deg);
-            animation: heartbeat 1s infinite;
-        }
-
-        .heart::before,
-        .heart::after {
-            content: '';
-            position: absolute;
-            width: 180px;
-            height: 180px;
-            background: red;
-            border-radius: 50%;
-        }
-        .heart::before { top: -90px; left: 0; }
-        .heart::after { left: 90px; top: 0; }
-
-        .heart-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(45deg);
-            font-family: 'Dancing Script', cursive;
-            font-size: 1.6rem;
-            color: #fff;
-            text-shadow: 0 0 15px #ffb3cc, 0 0 30px #ff6699;
-            text-align: center;
-            width: 150px;
-            line-height: 1.3;
-            z-index: 2;
-        }
-
-        .show {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 1;
-        }
-
-        /* Keyframes */
+        /* Keyframes Animations */
         @keyframes moon-glow {
             from { box-shadow: 0 0 50px var(--moon-color), 0 0 100px var(--moon-color), 0 0 150px #fff; }
             to { box-shadow: 0 0 60px var(--moon-color), 0 0 120px var(--moon-color), 0 0 180px #fff; }
@@ -227,9 +192,91 @@
             50% { transform: rotate(-10deg); }
         }
 
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(1) rotate(-45deg); }
-            50% { transform: scale(1.2) rotate(-45deg); }
+        @keyframes flyUp {
+            0% {
+                transform: translateY(0) translateX(0) scale(0.7);
+                opacity: 0.8;
+            }
+            10% {
+                 opacity: 1;
+            }
+            100% {
+                transform: translateY(-120vh) translateX(50px) scale(0.3);
+                opacity: 0;
+            }
+        }
+
+        /* Thêm CSS cho hộp quà và trái tim */
+        .gift-box {
+            position: absolute;
+            bottom: 25px;
+            left: 25px; /* Đổi sang góc trái */
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            z-index: 20;
+            transition: transform 0.2s ease;
+        }
+        .gift-box:hover {
+            transform: scale(1.1);
+        }
+        .gift-box svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 8px #fff);
+        }
+
+        .heart-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none; /* Ẩn mặc định */
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            backdrop-filter: blur(5px);
+        }
+        .heart-container.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .heart {
+            position: relative;
+            width: 100px;
+            height: 90px;
+            animation: beat 1s infinite;
+            transform: scale(2.5); /* Tăng kích thước trái tim */
+        }
+        .heart::before,
+        .heart::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            width: 52px;
+            height: 80px;
+            border-radius: 50px 50px 0 0;
+            background: #e0245e;
+        }
+        .heart::before {
+            left: 50px;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+        .heart::after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+
+        @keyframes beat {
+            0%, 100% { transform: scale(2.5); } /* Tăng kích thước trái tim */
+            50% { transform: scale(2.7); } /* Làm hiệu ứng đập rõ hơn */
         }
     </style>
 </head>
@@ -238,32 +285,44 @@
     <div class="night-sky">
         <div class="moon"></div>
         <div class="stars"></div>
-
+        
         <div class="greeting-card">
-            <h1>Gửi Thảo Nguyên Xinh Đẹp,</h1>
+            <h1>Gửi Thảo Nguyên xinh đẹp,</h1>
             <p>
-                Chúc em có một mùa Tết Trung Thu thật vui vẻ, ấm áp bên gia đình và những người thân yêu. <br>
-                Mong rằng mọi điều tốt đẹp và an lành sẽ đến với em!
+                Dưới ánh trăng tròn vành vạnh đêm nay, mình chúc bạn có một mùa Tết Trung Thu thật an yên, ngập tràn tiếng cười và ấm áp bên gia đình, bè bạn. <br>
+                Mong rằng ánh sáng lấp lánh của những chiếc lồng đèn sẽ dẫn lối cho mọi ước mơ của bạn bay cao, bay xa. <br>
+                Chúc cho cuộc sống bạn luôn ngọt ngào như miếng bánh nướng và rạng rỡ như ánh trăng rằm nhé!
             </p>
         </div>
 
         <div class="lantern-container">
+            <!-- Lồng đèn treo -->
             <div class="lantern lantern-1 yellow"></div>
             <div class="lantern lantern-2"></div>
             <div class="lantern lantern-3 yellow"></div>
-        </div>
 
-        <div class="gift-box" id="giftBox"></div>
-
-        <div class="heart-message" id="heartMessage">
-            <div class="heart">
-                <div class="heart-text">Chúc em mãi xinh đẹp 💖</div>
-            </div>
+            <!-- Lồng đèn trời bay lên -->
+            <div class="flying-lantern" style="left: 10%; animation-duration: 20s; animation-delay: 0s;"></div>
+            <div class="flying-lantern" style="left: 30%; animation-duration: 15s; animation-delay: 3s; transform: scale(0.8);"></div>
+            <div class="flying-lantern" style="left: 55%; animation-duration: 25s; animation-delay: 1s;"></div>
+            <div class="flying-lantern" style="left: 80%; animation-duration: 18s; animation-delay: 5s; transform: scale(0.9);"></div>
+            <div class="flying-lantern" style="left: 90%; animation-duration: 22s; animation-delay: 8s;"></div>
         </div>
     </div>
+    
+    <!-- Hộp quà và hiệu ứng trái tim -->
+    <div class="gift-box" id="giftBox">
+         <!-- SVG icon cho hộp quà -->
+        <svg fill="#f9ca24" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>gift</title> <path d="M26.899 10.021l-10.389-4.329c-0.291-0.12-0.631-0.12-0.922 0l-10.389 4.329c-0.342 0.142-0.559 0.48-0.559 0.852v3.523l-0.001 0.001h-0.64c-0.552 0-1 0.448-1 1v2c0 0.552 0.448 1 1 1h0.64v7.604c0 0.552 0.448 1 1 1h22c0.552 0 1-0.448 1-1v-7.604h0.64c0.552 0 1-0.448 1-1v-2c0-0.552-0.448-1-1-1h-0.64l0.001-0.001v-3.523c0-0.372-0.217-0.709-0.559-0.852zM16 7.185l8.369 3.487h-16.739l8.369-3.487zM5.18 12.361h21.64v1.278h-21.64v-1.278zM26 27.243h-20v-11.604h20v11.604zM18.818 10.685c-0.493-0.787-1.309-1.325-2.259-1.474-0.158-0.025-0.318-0.038-0.479-0.038-0.771 0-1.493 0.283-2.072 0.778-0.985 0.84-1.355 2.223-0.862 3.393l0.020 0.047 3.394 6.787 3.394-6.787 0.020-0.047c0.493-1.17-0.015-2.553-0.862-3.393z"></path> </g></svg>
+    </div>
 
+    <div class="heart-container" id="heartContainer">
+        <div class="heart"></div>
+    </div>
+
+    <!-- Nhạc nền Trung Thu -->
     <audio controls autoplay loop style="display:none;">
-        <source src="https://f9-stream.nixcdn.com/stream/1695886918512/2023/09/28/0/0/2/8/1695886918512.mp3" type="audio/mpeg">
+        <source src="https://f9-stream.nixcdn.com/stream/1695886918512/2023/09/28/0/0/2/8/1695886918512.mp3?rt=jV2UDBsC4S2eK1A-iKdiuQ&pk=1695886918512&path=2023/09/28/0/0/2/8/1695886918512.mp3" type="audio/mpeg">
         Trình duyệt của bạn không hỗ trợ phát nhạc.
     </audio>
 
@@ -271,6 +330,7 @@
         // Tạo các ngôi sao ngẫu nhiên
         const starsContainer = document.querySelector('.stars');
         const numStars = 150;
+
         for (let i = 0; i < numStars; i++) {
             const star = document.createElement('div');
             star.classList.add('star');
@@ -284,16 +344,22 @@
             starsContainer.appendChild(star);
         }
 
-        // Hiệu ứng hộp quà
+        // Xử lý sự kiện click hộp quà
         const giftBox = document.getElementById('giftBox');
-        const heartMessage = document.getElementById('heartMessage');
+        const heartContainer = document.getElementById('heartContainer');
 
-        giftBox.addEventListener('click', () => {
-            heartMessage.classList.add('show');
-            setTimeout(() => {
-                heartMessage.classList.remove('show');
-            }, 4000);
+        giftBox.addEventListener('click', (event) => {
+            event.stopPropagation(); // Ngăn sự kiện click lan ra ngoài
+            heartContainer.classList.add('visible');
+        });
+
+        heartContainer.addEventListener('click', () => {
+            // Ẩn trái tim khi click vào nền mờ
+            heartContainer.classList.remove('visible');
         });
     </script>
+
 </body>
 </html>
+
+
