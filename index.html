@@ -3,458 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trung Thu Vui Vẻ, Thảo Nguyên nhé!</title>
+    <title>Gửi Thảo Nguyên...</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Sử dụng font Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Pacifico&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --moon-color: #f7f3e1;
-            --sky-dark: #0f0f24;
-            --sky-light: #2d2d6a;
-            --lantern-red: #d92b2b;
-            --lantern-yellow: #f5b700;
+        /* Thêm font Pacifico cho chữ viết tay */
+        .font-pacifico {
+            font-family: 'Pacifico', cursive;
         }
-
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: 'Quicksand', sans-serif;
+        .font-inter {
+            font-family: 'Inter', sans-serif;
         }
-
-        .night-sky {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to top, var(--sky-light), var(--sky-dark));
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            cursor: pointer; /* Add cursor pointer to indicate interactivity */
+        /* Hiệu ứng trái tim bay */
+        @keyframes floatHeart {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
         }
-
-        .moon {
-            width: 150px;
-            height: 150px;
-            background-color: var(--moon-color);
-            border-radius: 50%;
-            box-shadow: 0 0 50px var(--moon-color), 0 0 100px var(--moon-color), 0 0 150px #fff;
-            position: absolute;
-            top: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: moon-glow 5s infinite alternate;
-        }
-        /* Add craters to the moon */
-        .moon::before, .moon::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.1);
-        }
-        .moon::before {
-            width: 30px;
-            height: 30px;
-            top: 20px;
-            right: 30px;
-        }
-        .moon::after {
-            width: 50px;
-            height: 50px;
-            bottom: 25px;
-            left: 20px;
-        }
-
-        .stars {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none; /* Make sure stars don't interfere with clicks */
-        }
-
-        .star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background-color: #fff;
-            border-radius: 50%;
-            animation: twinkle 2s infinite;
-        }
-
-        .greeting-card {
-            text-align: center;
-            color: #fff;
-            z-index: 10;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            animation: fadeIn 3s ease-in-out;
-            max-width: 90%;
-            pointer-events: none; /* Prevent card from blocking clicks on the sky */
-        }
-
-        .greeting-card h1 {
-            font-family: 'Dancing Script', cursive;
-            font-size: clamp(2.5rem, 6vw, 4rem);
-            margin: 0;
-            color: #ffd700;
-            text-shadow: 0 0 10px #ffd700;
-        }
-
-        .greeting-card p {
-            font-size: clamp(1rem, 2.5vw, 1.3rem);
-            line-height: 1.6;
-            margin-top: 20px;
-        }
-
-        .lantern-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none; /* Allow clicks to pass through */
-        }
-
-        .lantern {
-            position: absolute;
-            width: 60px;
-            height: 80px;
-            background-color: var(--lantern-red);
-            border-radius: 40% 40% 35% 35% / 50% 50% 45% 45%;
-            box-shadow: inset 0 -5px 10px rgba(0,0,0,0.2);
-            animation: swing 4s infinite ease-in-out;
-            transform-origin: top center;
-        }
-        .lantern.yellow {
-            background-color: var(--lantern-yellow);
-        }
-
-        .lantern::before { /* String */
-            content: '';
-            position: absolute;
-            top: -50px;
-            left: 50%;
-            width: 2px;
-            height: 50px;
-            background-color: #333;
-            transform: translateX(-50%);
-        }
-        .lantern::after { /* Tassel */
-            content: '';
-            position: absolute;
-            bottom: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 5px;
-            height: 30px;
-            background: linear-gradient(to bottom, gold, orangered);
-        }
-        
-        /* Lantern positions */
-        .lantern-1 { top: 5%; left: 15%; animation-duration: 4.5s; }
-        .lantern-2 { top: 10%; left: 80%; animation-duration: 3.8s; }
-        .lantern-3 { top: 20%; left: 5%; animation-duration: 5s; transform: scale(0.8); }
-
-        /* Flying lanterns */
-        .flying-lantern {
-            position: absolute;
-            bottom: -100px; /* Start from below the screen */
-            width: 40px;
-            height: 60px;
-            background: radial-gradient(circle at 50% 100%, #ffc947, #ff9a00);
-            border-radius: 50% 50% 30% 30% / 60% 60% 40% 40%;
-            opacity: 0;
-            animation: flyUp linear infinite;
-        }
-        
-        /* Firework effect styles */
-        .firework {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            pointer-events: none;
-        }
-        
-        .particle {
-            position: absolute;
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            animation: explode 1s ease-out forwards;
-        }
-        
-        /* Keyframes Animations */
-        @keyframes moon-glow {
-            from { box-shadow: 0 0 50px var(--moon-color), 0 0 100px var(--moon-color), 0 0 150px #fff; }
-            to { box-shadow: 0 0 60px var(--moon-color), 0 0 120px var(--moon-color), 0 0 180px #fff; }
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes swing {
-            0%, 100% { transform: rotate(10deg); }
-            50% { transform: rotate(-10deg); }
-        }
-
-        @keyframes flyUp {
-            0% {
-                transform: translateY(0) translateX(0) scale(0.7);
-                opacity: 0.8;
-            }
-            10% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-120vh) translateX(50px) scale(0.3);
-                opacity: 0;
-            }
-        }
-        
-        @keyframes explode {
-            0% {
-                transform: translate(0, 0) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(var(--x), var(--y)) scale(0);
-                opacity: 0;
-            }
-        }
-
-        /* CSS for gift box and heart */
-        .gift-box {
-            position: absolute;
-            bottom: 25px;
-            left: 25px; /* Moved to the left corner */
-            width: 60px;
-            height: 60px;
-            cursor: pointer;
-            z-index: 20;
-            transition: transform 0.2s ease;
-        }
-        .gift-box:hover {
-            transform: scale(1.1);
-        }
-        .gift-box svg {
-            width: 100%;
-            height: 100%;
-            filter: drop-shadow(0 0 8px #fff);
-        }
-
-        .heart-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: none; /* Hidden by default */
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            backdrop-filter: blur(5px);
-        }
-        .heart-container.visible {
-            display: flex;
-            opacity: 1;
-        }
-
         .heart {
+            position: absolute;
+            font-size: 1.5rem;
+            color: #f472b6; /* text-pink-400 */
+            animation: floatHeart 3s ease-out infinite;
+        }
+
+        /* Thêm CSS cho hiệu ứng lật thiệp 3D */
+        .card-container {
+            perspective: 1000px;
+        }
+        .card {
             position: relative;
-            width: 280px;
-            height: 260px;
-            animation: beat 1.2s infinite ease-in-out;
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+            cursor: pointer;
+        }
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            /* Các style chung cho 2 mặt thiệp, giống tấm thiệp cũ */
+            background-color: white;
+            border-radius: 1rem; /* rounded-xl */
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); /* shadow-2xl */
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+            padding: 2rem; /* p-8 */
         }
-        .heart::before,
-        .heart::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            width: 150px;
-            height: 240px;
-            border-radius: 80px 80px 0 0;
-            background: #e0245e;
+        .card-back {
+            /* Mặt sau xoay 180 độ ban đầu */
+            transform: rotateY(180deg);
+            padding: 2rem; /* p-8 */
         }
-        .heart::before {
-            left: 140px; /* Half of heart's width */
-            transform: rotate(-45deg);
-            transform-origin: 0 100%;
-        }
-        .heart::after {
-            left: 0;
-            transform: rotate(45deg);
-            transform-origin: 100% 100%;
+        .card.is-flipped {
+            /* Lật thẻ khi có class 'is-flipped' */
+            transform: rotateY(180deg);
         }
 
-        .heart-message {
-            position: relative; /* To appear above pseudo-elements */
-            z-index: 1;
-            color: #fff;
-            text-align: center;
-            font-size: 1.3rem;
-            font-weight: 600;
-            line-height: 1.5;
-            padding: 20px;
-            max-width: 90%;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.4);
-            transform: translateY(-22px);
-        }
-
-        @keyframes beat {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
     </style>
 </head>
-<body>
+<body class="font-inter bg-gradient-to-br from-rose-100 to-red-200 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
 
-    <div class="night-sky">
-        <div class="moon"></div>
-        <div class="stars"></div>
-        
-        <div class="greeting-card">
-            <h1>Gửi Thảo Nguyên xinh đẹp,</h1>
-            <p>
-                Dưới ánh trăng tròn vành vạnh đêm nay, mình chúc bạn có một mùa Tết Trung Thu thật an yên, ngập tràn tiếng cười và ấm áp bên gia đình, bè bạn. <br>
-                Mong rằng ánh sáng lấp lánh của những chiếc lồng đèn sẽ dẫn lối cho mọi ước mơ của bạn bay cao, bay xa. <br>
-                Chúc cho cuộc sống bạn luôn ngọt ngào như miếng bánh nướng và rạng rỡ như ánh trăng rằm nhé!
-                <br><br>
-                <em style="font-size: 0.9em; opacity: 0.8;">(Thử click lên bầu trời xem có điều bất ngờ gì nhé!)</em>
-            </p>
-        </div>
+    <!-- Các trái tim bay lơ lửng -->
+    <div class="heart" style="left: 10%; animation-delay: 0s;">❤️</div>
+    <div class="heart" style="left: 30%; animation-delay: 1.5s;">💖</div>
+    <div class="heart" style="left: 50%; animation-delay: 0.5s;">❤️</div>
+    <div class="heart" style="left: 70%; animation-delay: 2s;">💖</div>
+    <div class="heart" style="left: 90%; animation-delay: 1s;">❤️</div>
 
-        <div class="lantern-container">
-            <!-- Hanging lanterns -->
-            <div class="lantern lantern-1 yellow"></div>
-            <div class="lantern lantern-2"></div>
-            <div class="lantern lantern-3 yellow"></div>
+    <!-- Vùng chứa thiệp để tạo không gian 3D -->
+    <div class="card-container w-full max-w-lg h-[28rem] md:h-[30rem] z-10">
+        <!-- Tấm thiệp 3D -->
+        <div id="card" class="card w-full h-full">
+            
+            <!-- Mặt trước (Bìa thiệp) -->
+            <div class="card-face card-front text-center">
+                <h2 class="font-pacifico text-4xl text-rose-400 mb-4">Gửi Thảo Nguyên</h2>
+                <div class="text-7xl mb-6 animate-pulse">💌</div>
+                <p class="text-lg text-gray-600 font-semibold">(Bấm vào thiệp để mở nha)</p>
+            </div>
+            
+            <!-- Mặt sau (Nội dung thiệp) -->
+            <div class="card-face card-back text-center">
+                <!-- Hình ảnh emoji đáng yêu -->
+                <div class="text-7xl md:text-8xl mb-6">
+                    <span class="inline-block animate-bounce" style="animation-duration: 1.5s;">🐮</span>
+                    <span class="inline-block relative" style="top: -0.2em; left: -0.3em;">🤠</span>
+                </div>
 
-            <!-- Flying lanterns -->
-            <div class="flying-lantern" style="left: 10%; animation-duration: 20s; animation-delay: 0s;"></div>
-            <div class="flying-lantern" style="left: 30%; animation-duration: 15s; animation-delay: 3s; transform: scale(0.8);"></div>
-            <div class="flying-lantern" style="left: 55%; animation-duration: 25s; animation-delay: 1s;"></div>
-            <div class="flying-lantern" style="left: 80%; animation-duration: 18s; animation-delay: 5s; transform: scale(0.9);"></div>
-            <div class="flying-lantern" style="left: 90%; animation-duration: 22s; animation-delay: 8s;"></div>
-        </div>
-    </div>
-    
-    <!-- Gift box and heart effect -->
-    <div class="gift-box" id="giftBox">
-        <!-- SVG icon for gift box -->
-        <svg fill="#f9ca24" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>gift</title> <path d="M26.899 10.021l-10.389-4.329c-0.291-0.12-0.631-0.12-0.922 0l-10.389 4.329c-0.342 0.142-0.559 0.48-0.559 0.852v3.523l-0.001 0.001h-0.64c-0.552 0-1 0.448-1 1v2c0 0.552 0.448 1 1 1h0.64v7.604c0 0.552 0.448 1 1 1h22c0.552 0 1-0.448 1-1v-7.604h0.64c0.552 0 1-0.448 1-1v-2c0-0.552-0.448-1-1-1h-0.64l0.001-0.001v-3.523c0-0.372-0.217-0.709-0.559-0.852zM16 7.185l8.369 3.487h-16.739l8.369-3.487zM5.18 12.361h21.64v1.278h-21.64v-1.278zM26 27.243h-20v-11.604h20v11.604zM18.818 10.685c-0.493-0.787-1.309-1.325-2.259-1.474-0.158-0.025-0.318-0.038-0.479-0.038-0.771 0-1.493 0.283-2.072 0.778-0.985 0.84-1.355 2.223-0.862 3.393l0.020 0.047 3.394 6.787 3.394-6.787 0.020-0.047c0.493-1.17-0.015-2.553-0.862-3.393z"></path> </g></svg>
-    </div>
+                <!-- Tiêu đề chính -->
+                <h1 class="font-pacifico text-3xl md:text-4xl font-bold text-rose-500 mb-12 break-words">
+                    Thảo Nguyên làm "bò có mũ" của anh nha?
+                </h1>
 
-    <div class="heart-container" id="heartContainer">
-        <div class="heart">
-            <div class="heart-message">Chúc em mãi xinh đẹp, nhiều tiền và thành công trên con đường mà em chọn</div>
+                <!-- Chữ ký -->
+                <p class="text-right text-2xl font-pacifico text-red-400 mt-6 w-full px-4">
+                    DH 💖
+                </p>
+            </div>
         </div>
     </div>
 
-    <!-- Mid-Autumn background music -->
-    <audio controls autoplay loop style="display:none;">
-        <source src="https://f9-stream.nixcdn.com/stream/1695886918512/2023/09/28/0/0/2/8/1695886918512.mp3?rt=jV2UDBsC4S2eK1A-iKdiuQ&pk=1695886918512&path=2023/09/28/0/0/2/8/1695886918512.mp3" type="audio/mpeg">
-        Your browser does not support audio playback.
-    </audio>
-
+    <!-- JavaScript để xử lý việc lật thiệp -->
     <script>
-        // Create random stars
-        const starsContainer = document.querySelector('.stars');
-        const numStars = 150;
-
-        for (let i = 0; i < numStars; i++) {
-            const star = document.createElement('div');
-            star.classList.add('star');
-            star.style.top = `${Math.random() * 100}%`;
-            star.style.left = `${Math.random() * 100}%`;
-            star.style.animationDelay = `${Math.random() * 2}s`;
-            star.style.animationDuration = `${2 + Math.random() * 2}s`;
-            const size = `${1 + Math.random() * 2}px`;
-            star.style.width = size;
-            star.style.height = size;
-            starsContainer.appendChild(star);
-        }
-
-        // Handle gift box click event
-        const giftBox = document.getElementById('giftBox');
-        const heartContainer = document.getElementById('heartContainer');
-
-        giftBox.addEventListener('click', (event) => {
-            event.stopPropagation(); // Prevent the click from bubbling up
-            heartContainer.classList.add('visible');
+        document.addEventListener('DOMContentLoaded', () => {
+            const card = document.getElementById('card');
+            card.addEventListener('click', () => {
+                card.classList.toggle('is-flipped');
+            });
         });
-
-        heartContainer.addEventListener('click', () => {
-            // Hide the heart when clicking on the background
-            heartContainer.classList.remove('visible');
-        });
-
-        // --- NEW: Firework effect on click ---
-        const nightSky = document.querySelector('.night-sky');
-
-        nightSky.addEventListener('click', (e) => {
-            // Do not create fireworks if the heart container is visible
-            if (!heartContainer.classList.contains('visible')) {
-                 createFirework(e.clientX, e.clientY);
-            }
-        });
-
-        function createFirework(x, y) {
-            const firework = document.createElement('div');
-            firework.classList.add('firework');
-            firework.style.left = x + 'px';
-            firework.style.top = y + 'px';
-            document.body.appendChild(firework);
-
-            const particleCount = 30;
-            const colors = ['#ffd700', '#d92b2b', '#f5b700', '#ffffff', '#ffc947'];
-
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                
-                // Use polar coordinates for a circular explosion
-                const angle = Math.random() * Math.PI * 2;
-                const radius = Math.random() * 100 + 50; // Explosion radius
-
-                // Set custom properties for the animation
-                particle.style.setProperty('--x', Math.cos(angle) * radius + 'px');
-                particle.style.setProperty('--y', Math.sin(angle) * radius + 'px');
-                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-
-                firework.appendChild(particle);
-            }
-
-            // Remove the firework element after the animation ends to clean up the DOM
-            setTimeout(() => {
-                firework.remove();
-            }, 1000); 
-        }
-
     </script>
 
 </body>
 </html>
-
-
-
 
